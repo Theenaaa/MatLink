@@ -124,7 +124,7 @@ export default function LoginPage() {
                 CANONIX
               </span>
               <span className="text-[10px] uppercase font-bold tracking-widest px-2 py-0.5 rounded-full bg-orange-500/20 text-orange-400 border border-orange-500/30">
-                SIH 26099
+                Enterprise Portal
               </span>
             </div>
             <p className="text-xs text-slate-400">
@@ -151,13 +151,13 @@ export default function LoginPage() {
             <div>
               <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-orange-500/10 border border-orange-500/20 text-orange-400 text-xs font-semibold mb-3">
                 <Sparkles className="w-3.5 h-3.5" />
-                <span>Phase 2A Role-Based Shell</span>
+                <span>Enterprise Single Sign-On</span>
               </div>
               <h1 className="text-2xl lg:text-3xl font-black tracking-tight text-white">
                 Enterprise Single Sign-On & RBAC Portal
               </h1>
               <p className="text-sm text-slate-400 mt-2 leading-relaxed">
-                CANONIX enforces strict Multi-Tenant CPSE Isolation and Role-Based Access Control.
+                CANONIX enforces enterprise data security and Role-Based Access Control.
                 Select any verified role below to auto-fill credentials:
               </p>
             </div>
@@ -303,9 +303,9 @@ export default function LoginPage() {
               <div className="mt-6 pt-5 border-t border-slate-800 text-[11px] text-slate-300 flex items-center justify-between">
                 <div className="flex items-center gap-1.5">
                   <Lock className="w-3 h-3 text-emerald-400" />
-                  <span>JWT HS256 Encrypted</span>
+                  <span>256-bit SSL Encrypted</span>
                 </div>
-                <div>PostgreSQL RBAC Enforced</div>
+                <div>Enterprise RBAC Protected</div>
               </div>
             </div>
           </div>
@@ -314,8 +314,8 @@ export default function LoginPage() {
       </div>
 
       {/* Footer */}
-      <footer className="p-4 border-t border-slate-900 text-center text-xs text-slate-300 relative z-10">
-        CANONIX Platform · Ministry of Petroleum & Natural Gas · Smart India Hackathon 2026
+      <footer className="p-4 border-t border-slate-900 text-center text-xs text-slate-400 relative z-10">
+        CANONIX Platform · Ministry of Petroleum & Natural Gas · Government of India
       </footer>
     </div>
   );

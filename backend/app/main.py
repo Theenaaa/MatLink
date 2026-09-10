@@ -5,7 +5,7 @@ from app.api import health, auth, uploads, materials, dashboard, matches, expert
 
 app = FastAPI(
     title=settings.PROJECT_NAME,
-    description=f"{settings.PROJECT_DESCRIPTION} - SIH 26099 (Ministry of Petroleum & Natural Gas / CPCL)",
+    description=f"{settings.PROJECT_DESCRIPTION} - Ministry of Petroleum & Natural Gas / CPCL Technical Cell",
     version=settings.VERSION,
     docs_url="/docs",
     redoc_url="/redoc",

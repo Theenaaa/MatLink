@@ -42,7 +42,7 @@ class Settings(BaseSettings):
         return v
 
     # Security & JWT
-    JWT_SECRET: str = "canonix_super_secure_enterprise_secret_key_sih_2026"
+    JWT_SECRET: str = "canonix_super_secure_enterprise_secret_key_2026"
     JWT_ALGORITHM: str = "HS256"
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 60 * 24  # 24 hours
 

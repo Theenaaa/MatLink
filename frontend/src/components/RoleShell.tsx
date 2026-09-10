@@ -125,7 +125,7 @@ export default function RoleShell({ children }: { children: React.ReactNode }) {
                   CANONIX
                 </span>
                 <span className="text-[10px] uppercase font-bold tracking-widest px-2 py-0.5 rounded-full bg-orange-500/20 text-orange-400 border border-orange-500/30">
-                  SIH 26099
+                  Enterprise Portal
                 </span>
               </div>
               <p className="text-[11px] text-slate-400 font-medium leading-none">

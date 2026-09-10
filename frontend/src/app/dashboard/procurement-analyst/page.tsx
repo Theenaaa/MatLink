@@ -123,7 +123,7 @@ export default function ProcurementAnalystDashboard() {
               Identical materials procured by multiple CPSEs with significant cost deviations
             </p>
           </div>
-          <span className="text-xs font-mono text-purple-400">SIH 26099 Intelligence</span>
+          <span className="text-xs font-mono text-purple-400">Procurement Intelligence</span>
         </div>
 
         <div className="space-y-3">

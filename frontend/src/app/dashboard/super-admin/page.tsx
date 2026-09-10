@@ -135,7 +135,7 @@ export default function SuperAdminDashboard() {
               Live material counts per CPSE — queried directly from PostgreSQL
             </p>
           </div>
-          <span className="text-xs font-mono text-slate-400">SIH 26099 Federation</span>
+          <span className="text-xs font-mono text-slate-400">Enterprise Federation</span>
         </div>
 
         {loading ? (
