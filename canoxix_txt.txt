@@ -1,0 +1,4592 @@
+============================================================
+CANONIX
+National Material Code Standardization & Harmonization Platform
+============================================================
+
+PROJECT TYPE:
+Enterprise AI + NLP + Material Master Data Harmonization Platform
+
+SMART INDIA HACKATHON PROBLEM STATEMENT:
+26099
+
+ORGANIZATION:
+Ministry of Petroleum & Natural Gas
+
+DEPARTMENT / ORGANIZATION:
+Chennai Petroleum Corporation Limited (CPCL)
+
+CATEGORY:
+Software
+
+THEME:
+Smart Automation
+
+PROJECT NAME:
+CANONIX
+
+FULL PROJECT NAME:
+CANONIX – AI-Driven National Material Identity, Standardization
+and Harmonization Platform Across CPSEs
+
+============================================================
+1. PROJECT VISION
+============================================================
+
+CANONIX is an enterprise-grade AI-powered platform designed to
+standardize, harmonize, classify and map material master data
+across Central Public Sector Enterprises (CPSEs), especially
+organizations operating in Oil & Gas, Power, Steel, Mining and
+Heavy Engineering.
+
+Different CPSEs often maintain their own ERP/SAP material masters.
+
+The same or functionally equivalent physical material can exist
+under completely different:
+
+- Material Codes
+- Material Descriptions
+- Abbreviations
+- Units of Measurement
+- Technical specifications
+- Standards
+- Grades
+- Sizes
+- Pressure ratings
+- Classification structures
+- Manufacturer references
+
+Because of this, organizations cannot easily identify that two
+material records represent the same physical or functionally
+equivalent material.
+
+CANONIX solves this problem by creating a common "Material Identity"
+layer.
+
+The system takes raw material data from individual CPSEs, preserves
+the original data, cleans and normalizes descriptions, extracts
+technical attributes, creates a structured Material DNA, generates
+semantic embeddings, performs hybrid AI matching, explains the
+matching decision, sends uncertain matches to human experts, and
+finally creates a National Material Identity / National Material
+Code while preserving every legacy CPSE code.
+
+The central philosophy of CANONIX is:
+
+DETECT
+    ↓
+UNDERSTAND
+    ↓
+NORMALIZE
+    ↓
+HARMONIZE
+    ↓
+VALIDATE
+    ↓
+GOVERN
+    ↓
+PREVENT
+    ↓
+OPTIMIZE
+
+
+============================================================
+2. PROBLEM STATEMENT
+============================================================
+
+CPSEs across sectors such as Oil & Gas, Power, Steel, Mining and
+Heavy Engineering use large material master databases in their
+ERP/SAP systems.
+
+Many of these organizations procure and use the same or similar
+materials.
+
+However, each organization may independently create material
+records.
+
+For example:
+
+CPCL:
+M-PIPE-00772
+
+Description:
+PIPE 8 BE, SEAMLESS, A106 Gr.B, STD
+PIPE 8 INCH BE, SEAMLESS, ASTM A106 Gr.B,
+SCH.STD, B-36.10
+
+IOCL:
+M-PIPE-00923
+
+Description:
+SMLS PIPE / 8"/ STD / A 106 Gr. B
+SEAMLESS PIPE /8.00/ B36.10/STD/ASTM A106 Grade B
+
+Another CPSE could have:
+
+M-PIPE-01221
+
+Description:
+8 IN CARBON STEEL SMLS PIPE ASTM A106 GR B
+SCH STD ASME B36.10
+
+These descriptions look different as strings, but they can represent
+the same material identity.
+
+Similarly:
+
+CPCL:
+M-VLVE-00111
+GATE VL. 8.00/RF/150/SHT51301
+
+Another CPSE:
+M-VLVE-00881
+8 IN GATE VALVE RF CLASS 150 API 600
+
+Another:
+M-VLVE-01921
+GATE VALVE 8" / RF / 150# / API600
+
+A simple text comparison is not sufficient to determine whether
+these materials are identical, near duplicates, functionally
+equivalent or actually different.
+
+The system therefore needs to understand:
+
+- Engineering terminology
+- Abbreviations
+- Units
+- Technical attributes
+- Standards
+- Material grades
+- Size
+- Pressure rating
+- Connection types
+- Application context
+- Material categories
+- Semantic meaning
+- Historical procurement behavior
+
+The objective is to create a trusted national material identity
+framework that allows different CPSE material codes to map to one
+common national material identity where appropriate.
+
+
+============================================================
+3. CORE OBJECTIVES
+============================================================
+
+CANONIX must achieve the following:
+
+1. Accept raw material master data from individual CPSEs.
+
+2. Ensure each CPSE can upload only its own data.
+
+3. Preserve original CPSE material codes and descriptions.
+
+4. Validate uploaded files.
+
+5. Detect missing and invalid data.
+
+6. Normalize inconsistent terminology and units.
+
+7. Extract technical attributes automatically from descriptions.
+
+8. Build structured Material DNA.
+
+9. Generate semantic embeddings for material descriptions.
+
+10. Find candidate materials across CPSEs.
+
+11. Perform hybrid material matching.
+
+12. Distinguish between:
+    - SAME
+    - NEAR DUPLICATE
+    - FUNCTIONALLY EQUIVALENT
+    - APPROVED SUBSTITUTE
+    - RELATED
+    - DIFFERENT
+
+13. Provide explainable AI decisions.
+
+14. Allow domain experts to approve/reject/modify AI results.
+
+15. Learn from expert decisions.
+
+16. Generate standardized canonical material descriptions.
+
+17. Create National Material Identities.
+
+18. Map all legacy CPSE material codes to National Material Codes.
+
+19. Preserve legacy codes for migration and traceability.
+
+20. Provide cross-CPSE procurement intelligence.
+
+21. Identify aggregated national demand.
+
+22. Identify duplicate procurement opportunities.
+
+23. Prevent duplicate material creation in the future.
+
+24. Provide dashboards, analytics, audit logs and governance.
+
+
+============================================================
+4. IMPORTANT DATA OWNERSHIP MODEL
+============================================================
+
+Each CPSE uploads its own material master.
+
+A CPCL user does NOT upload IOCL/BPCL/HPCL data.
+
+Example:
+
+CPCL LOGIN
+    ↓
+CPCL ADMIN
+    ↓
+UPLOAD CPCL FILE
+    ↓
+Backend automatically associates records with CPCL
+
+IOCL LOGIN
+    ↓
+IOCL ADMIN
+    ↓
+UPLOAD IOCL FILE
+    ↓
+Backend automatically associates records with IOCL
+
+The CPSE must NOT manually select its organization during upload.
+
+The backend determines the CPSE from the authenticated user's
+cpse_id.
+
+This prevents accidental or malicious cross-organization data
+assignment.
+
+The central CANONIX AI engine can compare material identities across
+CPSEs where permitted.
+
+CPSE users should not be able to modify another CPSE's original
+material data.
+
+
+============================================================
+5. HIGH-LEVEL SYSTEM ARCHITECTURE
+============================================================
+
+                    CPSE USERS
+                        |
+       +----------------+----------------+
+       |                |                |
+      CPCL             IOCL             BPCL
+       |                |                |
+       +----------------+----------------+
+                        |
+                        v
+               CANONIX WEB PLATFORM
+                        |
+                        v
+                 AUTHENTICATION
+                        |
+                        v
+                ROLE-BASED ACCESS
+                        |
+                        v
+                 DATA INGESTION
+                        |
+                        v
+                FILE VALIDATION
+                        |
+                        v
+                RAW DATA STORAGE
+                        |
+                        v
+              CLEANING & NORMALIZATION
+                        |
+                        v
+             TECHNICAL ATTRIBUTE EXTRACTION
+                        |
+                        v
+                 MATERIAL DNA
+                        |
+            +-----------+-----------+
+            |                       |
+            v                       v
+       NLP EMBEDDINGS          DOMAIN RULES
+            |                       |
+            v                       v
+       VECTOR SEARCH         ENGINEERING CHECKS
+            |                       |
+            +-----------+-----------+
+                        |
+                        v
+                HYBRID MATCHING
+                        |
+                        v
+              MATCH CLASSIFICATION
+                        |
+                        v
+              EXPLAINABLE AI RESULT
+                        |
+                        v
+                 HUMAN REVIEW
+                        |
+              +---------+---------+
+              |                   |
+           APPROVE              REJECT
+              |
+              v
+       NATIONAL MATERIAL
+           IDENTITY
+              |
+              v
+       LEGACY CODE MAPPING
+              |
+              v
+     NATIONAL MATERIAL MASTER
+              |
+              v
+      PROCUREMENT INTELLIGENCE
+              |
+              v
+        ANALYTICS & REPORTS
+
+
+============================================================
+6. RECOMMENDED TECHNOLOGY STACK
+============================================================
+
+FRONTEND
+--------
+
+Next.js
+React
+TypeScript
+Tailwind CSS
+shadcn/ui
+
+Charts:
+Recharts
+
+Icons:
+Lucide React
+
+Authentication UI:
+Next.js authentication flow with JWT/session handling.
+
+
+BACKEND
+-------
+
+Python
+FastAPI
+Pydantic
+SQLAlchemy
+Alembic
+
+Python is preferred because the AI/NLP pipeline will also be
+implemented in Python.
+
+
+DATABASE
+--------
+
+PostgreSQL
+
+Extensions:
+pgvector
+
+PostgreSQL stores:
+
+- Users
+- CPSEs
+- Materials
+- Attributes
+- Matches
+- National Materials
+- Mappings
+- Audit logs
+- Procurement data
+
+
+AI / NLP
+--------
+
+spaCy
+
+Used for:
+- Entity/attribute extraction
+- Tokenization
+- Pattern matching
+- Custom NLP pipelines
+
+Sentence Transformers
+
+Used for:
+- Semantic embeddings
+- Similarity search
+- Material description understanding
+
+scikit-learn
+
+Used for:
+- Scoring
+- Clustering
+- Evaluation
+- Classification utilities
+
+
+VECTOR SEARCH
+-------------
+
+PostgreSQL + pgvector
+
+Alternative for experimentation:
+FAISS
+
+
+DOCUMENT PROCESSING
+-------------------
+
+PyMuPDF
+OCR engine if required
+
+Used for extracting material information from technical PDFs,
+tender documents and specifications.
+
+
+OPTIONAL KNOWLEDGE GRAPH
+------------------------
+
+Neo4j
+
+Use this in the advanced version for:
+
+Material
+   |
+   +--- Standard
+   |
+   +--- Grade
+   |
+   +--- Manufacturer
+   |
+   +--- Application
+   |
+   +--- CPSE
+   |
+   +--- National Material
+   |
+   +--- Substitute
+
+
+DEPLOYMENT
+----------
+
+Docker
+Docker Compose
+
+Development:
+Local PostgreSQL
+
+Production:
+PostgreSQL
+FastAPI
+Next.js
+
+
+VERSION CONTROL
+---------------
+
+Git
+GitHub
+
+
+============================================================
+7. USER ROLES
+============================================================
+
+There should be four primary roles.
+
+1. SUPER ADMIN
+2. CPSE ADMIN
+3. MATERIAL EXPERT
+4. PROCUREMENT ANALYST
+
+
+------------------------------------------------------------
+7.1 SUPER ADMIN
+------------------------------------------------------------
+
+Super Admin is the central platform administrator.
+
+Scope:
+ALL CPSEs
+
+Responsibilities:
+
+- Manage CPSE organizations
+- Create/manage CPSE administrators
+- Manage users
+- Configure system
+- View all uploaded datasets
+- Monitor data processing
+- View all material records
+- View national material master
+- Manage classification/taxonomy
+- Manage normalization dictionaries
+- Monitor AI performance
+- View system-wide analytics
+- Manage governance
+- View audit logs
+- Approve high-level changes
+- Manage material lifecycle
+- Configure thresholds
+- Manage system health
+
+
+Super Admin pages:
+
+/admin/dashboard
+/admin/cpses
+/admin/users
+/admin/uploads
+/admin/materials
+/admin/national-materials
+/admin/matching
+/admin/taxonomy
+/admin/normalization-rules
+/admin/analytics
+/admin/audit-logs
+/admin/settings
+
+
+------------------------------------------------------------
+7.2 CPSE ADMIN
+------------------------------------------------------------
+
+CPSE Admin belongs to one specific CPSE.
+
+Example:
+
+CPSE Admin:
+CPCL
+
+cpse_id:
+CPCL
+
+Scope:
+ONLY CPCL's own data.
+
+Responsibilities:
+
+- Upload CPCL material master
+- View CPCL materials
+- View upload history
+- Fix validation errors
+- Start harmonization
+- View AI recommendations involving CPCL
+- Submit uncertain matches for review
+- View CPCL → National Material mappings
+- View material statistics
+- View CPCL procurement data
+- View reports
+
+CPCL must never be able to change another CPSE's raw data.
+
+
+CPSE pages:
+
+/dashboard
+/materials
+/materials/[id]
+/upload
+/uploads
+/validation
+/harmonization
+/matches
+/national-mappings
+/procurement
+/reports
+/profile
+
+
+------------------------------------------------------------
+7.3 MATERIAL EXPERT
+------------------------------------------------------------
+
+Material Expert is responsible for technical validation.
+
+Responsibilities:
+
+- Review AI material matches
+- Compare technical attributes
+- Approve matches
+- Reject matches
+- Modify AI recommendations
+- Approve canonical descriptions
+- Approve National Material Identity
+- Review substitute relationships
+- Resolve conflicts
+- Provide reasoning
+
+Pages:
+
+/expert/dashboard
+/expert/review-queue
+/expert/matches/[id]
+/expert/material-comparison
+/expert/national-materials
+/expert/approvals
+/expert/history
+
+
+------------------------------------------------------------
+7.4 PROCUREMENT ANALYST
+------------------------------------------------------------
+
+Procurement Analyst focuses on procurement intelligence.
+
+Responsibilities:
+
+- View national demand
+- Compare CPSE demand
+- Analyze purchasing patterns
+- Identify duplicate procurement
+- Identify demand aggregation opportunities
+- Analyze suppliers
+- View price trends
+- Generate procurement reports
+
+Pages:
+
+/procurement/dashboard
+/procurement/national-demand
+/procurement/material-analysis
+/procurement/suppliers
+/procurement/opportunities
+/procurement/reports
+
+
+============================================================
+8. AUTHENTICATION AND AUTHORIZATION
+============================================================
+
+Authentication should use secure JWT/session-based authentication.
+
+User login:
+
+Email
+Password
+
+Backend validates credentials.
+
+The authenticated session contains:
+
+user_id
+role
+cpse_id
+
+Example:
+
+{
+    user_id: "123",
+    role: "CPSE_ADMIN",
+    cpse_id: "CPCL"
+}
+
+For CPCL Admin:
+
+role:
+CPSE_ADMIN
+
+cpse_id:
+CPCL
+
+
+For Super Admin:
+
+role:
+SUPER_ADMIN
+
+cpse_id:
+NULL
+
+
+Authorization must be enforced at backend level.
+
+Do NOT rely only on frontend hiding pages.
+
+Example:
+
+CPCL Admin requests:
+
+GET /api/materials
+
+Backend must automatically apply:
+
+WHERE cpse_id = current_user.cpse_id
+
+A CPCL user must not be able to modify:
+
+cpse_id = IOCL
+
+
+============================================================
+9. CPSE MATERIAL MASTER UPLOAD
+============================================================
+
+The real CPSE upload file should resemble actual legacy material
+master data.
+
+Example:
+
+Material Code | Description | Order Qty | UOM
+
+M-PIPE-00772
+PIPE 8 BE, SEAMLESS, A106 Gr.B, STD
+PIPE 8 INCH BE, SEAMLESS, ASTM A106 Gr.B,
+SCH.STD, B-36.10
+1200
+M
+
+M-PIPE-00923
+SMLS PIPE / 12"/ STD / A 106 Gr. B
+SEAMLESS PIPE /12.00/ B36.10/STD/ASTM A106 Grade B.
+18
+M
+
+M-ELBO-00732
+ELBOW.90 A 234 GR.WPB BW 8.0 IN STD
+ELBOW.90 B-16.9 ASTM A 234 GR.WPB BW 1.5D
+8.0 INCH STD
+12
+NO
+
+M-FLAN-01357
+FLNG.WN A 105 150 8.0 INCH STD
+12
+NO
+
+M-VLVE-00111
+GATE VL. 8.00/RF/150/SHT51301
+5
+NO
+
+
+============================================================
+10. CPSE UPLOAD EXCEL REQUIRED FIELDS
+============================================================
+
+Minimum required raw upload columns:
+
+1. Material Code
+2. Description
+3. Order Qty
+4. UOM
+
+
+IMPORTANT:
+
+There should NOT be a CPSE column in the uploaded file.
+
+The system knows CPSE from the logged-in user's cpse_id.
+
+
+Example:
+
+CPCL user
+    ↓
+uploads Excel
+    ↓
+backend knows:
+cpse_id = CPCL
+    ↓
+all imported records automatically receive:
+cpse_id = CPCL
+
+
+Optional future columns can include:
+
+Material Group
+Material Type
+Manufacturer
+Manufacturer Part Number
+Plant
+Status
+etc.
+
+But CANONIX should be capable of working with the minimum raw
+dataset because the technical attributes may be embedded inside
+the description itself.
+
+
+============================================================
+11. UPLOAD PROCESS
+============================================================
+
+Step 1:
+User opens Upload page.
+
+Step 2:
+System displays:
+
+Logged in as:
+CPCL
+
+Data Type:
+Material Master
+
+Step 3:
+User uploads:
+
+CPCL_material_master.xlsx
+
+Step 4:
+Backend receives file.
+
+Step 5:
+Backend creates uploaded_files record.
+
+Step 6:
+Read Excel using Pandas/openpyxl.
+
+Step 7:
+Validate required columns.
+
+Required:
+
+Material Code
+Description
+Order Qty
+UOM
+
+Step 8:
+Validate rows.
+
+Check:
+
+- Missing material code
+- Missing description
+- Invalid quantity
+- Invalid UOM
+- Duplicate material codes
+- Empty rows
+- Invalid data types
+
+Step 9:
+Generate validation summary.
+
+Example:
+
+Total rows:
+12,000
+
+Valid:
+11,850
+
+Invalid:
+150
+
+Missing description:
+32
+
+Missing material code:
+10
+
+Invalid UOM:
+28
+
+Duplicate material code:
+80
+
+
+Step 10:
+Show preview.
+
+Step 11:
+User clicks:
+
+IMPORT VALID RECORDS
+
+Step 12:
+Store records in PostgreSQL.
+
+Step 13:
+Associate every material with:
+
+cpse_id
+uploaded_file_id
+source_row_number
+
+
+============================================================
+12. DATABASE ARCHITECTURE
+============================================================
+
+Use PostgreSQL.
+
+Core tables:
+
+1. roles
+2. cpse
+3. users
+4. uploaded_files
+5. materials
+6. material_attributes
+7. material_embeddings
+8. material_matches
+9. national_materials
+10. material_mappings
+11. audit_logs
+
+Future:
+
+12. procurement_transactions
+13. suppliers
+14. review_actions
+15. normalization_rules
+16. classification_taxonomy
+
+
+============================================================
+13. ROLES TABLE
+============================================================
+
+roles
+
+id
+name
+description
+created_at
+
+
+Example:
+
+SUPER_ADMIN
+CPSE_ADMIN
+MATERIAL_EXPERT
+PROCUREMENT_ANALYST
+
+
+============================================================
+14. CPSE TABLE
+============================================================
+
+cpse
+
+id
+code
+name
+status
+created_at
+updated_at
+
+
+Example:
+
+1
+CPCL
+Chennai Petroleum Corporation Limited
+
+2
+IOCL
+Indian Oil Corporation Limited
+
+3
+BPCL
+Bharat Petroleum Corporation Limited
+
+
+============================================================
+15. USERS TABLE
+============================================================
+
+users
+
+id
+name
+email
+password_hash
+role_id
+cpse_id
+is_active
+last_login_at
+created_at
+updated_at
+
+
+Foreign keys:
+
+role_id → roles.id
+cpse_id → cpse.id
+
+
+============================================================
+16. UPLOADED_FILES TABLE
+============================================================
+
+uploaded_files
+
+id
+cpse_id
+uploaded_by
+file_name
+file_type
+file_size
+data_type
+total_rows
+valid_rows
+invalid_rows
+status
+uploaded_at
+processed_at
+
+
+Example status:
+
+UPLOADED
+VALIDATING
+VALIDATED
+PROCESSING
+COMPLETED
+FAILED
+
+
+============================================================
+17. MATERIALS TABLE
+============================================================
+
+This is the RAW MATERIAL table.
+
+materials
+
+id
+cpse_id
+uploaded_file_id
+source_row_number
+material_code
+raw_description
+order_qty
+uom
+status
+created_at
+updated_at
+
+
+IMPORTANT:
+
+The original CPSE description must NEVER be destroyed.
+
+Example:
+
+raw_description:
+
+PIPE 8 BE, SEAMLESS, A106 Gr.B, STD
+PIPE 8 INCH BE, SEAMLESS, ASTM A106 Gr.B,
+SCH.STD, B-36.10
+
+
+Do not replace the raw description with an AI-generated value.
+
+
+============================================================
+18. WHY RAW DATA MUST BE PRESERVED
+============================================================
+
+CANONIX must always preserve:
+
+Original Material Code
+Original Description
+Original UOM
+Original Quantity
+Source File
+Source Row
+
+Reasons:
+
+- Auditability
+- Traceability
+- Explainability
+- Migration
+- Legal/governance requirements
+- Debugging
+- Comparison of before/after data
+
+The system should have:
+
+RAW
+    ↓
+NORMALIZED
+    ↓
+CANONICAL
+
+
+============================================================
+19. MATERIAL ATTRIBUTES TABLE
+============================================================
+
+material_attributes
+
+id
+material_id
+attribute_name
+raw_value
+normalized_value
+normalized_unit
+confidence_score
+extraction_method
+created_at
+updated_at
+
+
+Example:
+
+Material:
+
+M-PIPE-00772
+
+
+Extracted attributes:
+
+material_type:
+PIPE
+
+size:
+8 INCH
+
+normalized_size:
+203.2
+
+normalized_unit:
+MM
+
+construction:
+SEAMLESS
+
+grade:
+A106 Gr.B
+
+normalized_grade:
+ASTM A106 Gr.B
+
+schedule:
+STD
+
+end_type:
+BE
+
+standard:
+B-36.10
+
+normalized_standard:
+ASME B36.10
+
+
+============================================================
+20. WHY ATTRIBUTES SHOULD BE SEPARATE
+============================================================
+
+Different material types have different technical attributes.
+
+Pipe:
+
+Size
+Grade
+Schedule
+Construction
+End Type
+Standard
+
+Valve:
+
+Valve Type
+Size
+Material
+Pressure Class
+Connection
+Trim
+Standard
+
+Bearing:
+
+Bearing Type
+Bore
+Outer Diameter
+Width
+Material
+Seal
+
+Pump:
+
+Pump Type
+Capacity
+Head
+Material
+Size
+Standard
+
+Therefore, do NOT create one huge table with hundreds of nullable
+columns.
+
+Use flexible material_attributes.
+
+
+============================================================
+21. MATERIAL DNA
+============================================================
+
+Material DNA is the structured technical representation of a
+material.
+
+Example:
+
+RAW DESCRIPTION:
+
+PIPE 8 BE, SEAMLESS, A106 Gr.B, STD
+PIPE 8 INCH BE, SEAMLESS, ASTM A106 Gr.B,
+SCH.STD, B-36.10
+
+
+Material DNA:
+
+{
+    "material_type": "PIPE",
+    "size": {
+        "value": 203.2,
+        "unit": "MM"
+    },
+    "construction": "SEAMLESS",
+    "grade": "ASTM A106 Gr.B",
+    "schedule": "STD",
+    "end_type": "BE",
+    "standard": "ASME B36.10"
+}
+
+
+Material DNA becomes the foundation of matching.
+
+
+============================================================
+22. NORMALIZATION ENGINE
+============================================================
+
+Normalization should happen before semantic matching.
+
+Use deterministic rules first.
+
+Examples:
+
+CS
+C.S.
+CARBON STL
+CARBON STEEL
+
+all normalize to:
+
+CARBON STEEL
+
+
+Pressure:
+
+CL300
+CL 300
+300#
+CLASS 300
+
+normalize to:
+
+CLASS 300
+
+
+Standard:
+
+B36.10
+B-36.10
+ASME B36.10
+
+normalize to:
+
+ASME B36.10
+
+
+Size:
+
+2"
+2 IN
+2 INCH
+50.8 MM
+
+normalize to a canonical representation:
+
+50.8 MM
+
+
+IMPORTANT:
+
+Normalization must NOT delete the original representation.
+
+
+============================================================
+23. NLP ATTRIBUTE EXTRACTION
+============================================================
+
+Use spaCy + Regex + domain dictionaries.
+
+Input:
+
+GATE VL. 8.00/RF/150/SHT51301
+
+
+Potential extraction:
+
+material_type:
+GATE VALVE
+
+size:
+8 INCH
+
+connection:
+RF
+
+pressure_rating:
+CLASS 150
+
+trim:
+SHT51301
+
+
+Another example:
+
+ELBOW.90 A 234 GR.WPB BW 8.0 IN STD
+
+
+Extract:
+
+type:
+ELBOW
+
+angle:
+90 DEGREE
+
+grade:
+ASTM A234 WPB
+
+connection:
+BW
+
+size:
+8 INCH
+
+schedule:
+STD
+
+
+============================================================
+24. SEMANTIC EMBEDDINGS
+============================================================
+
+After normalization and Material DNA generation:
+
+Canonical/normalized description
+        ↓
+Sentence Transformer
+        ↓
+Embedding vector
+
+
+Example:
+
+Material A:
+
+8 INCH SEAMLESS CARBON STEEL PIPE
+ASTM A106 GRADE B
+SCHEDULE STD
+ASME B36.10
+
+
+Material B:
+
+PIPE 8 IN CARBON STEEL
+SEAMLESS A106 GR B
+STD
+B36.10
+
+
+The wording is different but semantic meaning is highly similar.
+
+The embedding vectors should be close.
+
+
+============================================================
+25. VECTOR SEARCH
+============================================================
+
+Use PostgreSQL + pgvector.
+
+material_embeddings:
+
+id
+material_id
+embedding
+model_name
+embedding_version
+created_at
+
+
+Workflow:
+
+New material
+    ↓
+Generate embedding
+    ↓
+Vector search
+    ↓
+Top 20 candidate materials
+    ↓
+Hybrid matching
+
+
+Vector search should NOT make the final decision.
+
+It only retrieves candidates.
+
+
+============================================================
+26. HYBRID MATCHING ENGINE
+============================================================
+
+This is one of the most important components.
+
+Do NOT use only cosine similarity.
+
+Use:
+
+Semantic Similarity
++
+Attribute Matching
++
+Engineering Rules
++
+Classification Compatibility
++
+Standards Compatibility
++
+Unit Normalization
+
+
+Conceptual formula:
+
+FINAL SCORE =
+    semantic_score * 0.40
+    +
+    attribute_score * 0.30
+    +
+    rule_score * 0.20
+    +
+    classification_score * 0.10
+
+
+Weights should be configurable.
+
+
+============================================================
+27. ATTRIBUTE MATCHING
+============================================================
+
+Example:
+
+Material A:
+
+PIPE
+8 INCH
+SEAMLESS
+A106 Gr.B
+STD
+B36.10
+
+
+Material B:
+
+PIPE
+203.2 MM
+SEAMLESS
+ASTM A106 Grade B
+STD
+ASME B36.10
+
+
+Comparison:
+
+Type:
+MATCH
+
+Size:
+MATCH after normalization
+
+Construction:
+MATCH
+
+Grade:
+MATCH
+
+Schedule:
+MATCH
+
+Standard:
+MATCH
+
+Result:
+
+Very high probability of SAME.
+
+
+============================================================
+28. ENGINEERING RULES
+============================================================
+
+Engineering rules must override misleading text similarity.
+
+Example:
+
+Material A:
+
+GATE VALVE
+8 INCH
+CLASS 300
+
+
+Material B:
+
+GATE VALVE
+8 INCH
+CLASS 150
+
+
+Semantic similarity may be extremely high.
+
+But pressure class differs.
+
+Therefore:
+
+NOT SAME
+
+Potentially:
+
+NEAR_DUPLICATE
+or
+RELATED
+
+depending on the technical rules.
+
+
+Another example:
+
+Pipe:
+
+A106 Gr.B
+
+versus
+
+A312 TP304
+
+These should NOT be treated as identical merely because:
+
+8 INCH PIPE
+
+appears in both.
+
+
+============================================================
+29. MATCH RELATIONSHIP TYPES
+============================================================
+
+CANONIX should classify relationships as:
+
+1. SAME
+
+Same material identity.
+
+2. NEAR_DUPLICATE
+
+Very similar records but with minor differences/noise.
+
+3. FUNCTIONALLY_EQUIVALENT
+
+Different specifications/codes but technically serve the same
+function under defined rules.
+
+4. APPROVED_SUBSTITUTE
+
+Can be substituted according to approved technical rules.
+
+5. RELATED
+
+Same material family but different technical identity.
+
+6. DIFFERENT
+
+Technically different materials.
+
+
+============================================================
+30. MATCH SCORE THRESHOLDS
+============================================================
+
+Example configuration:
+
+90-100:
+HIGH CONFIDENCE
+
+75-89:
+MEDIUM CONFIDENCE
+
+Below 75:
+LOW CONFIDENCE
+
+
+But final relationship should depend on both score and technical
+rules.
+
+Example:
+
+Score = 96%
+
+Pressure mismatch
+
+Final:
+NOT SAME
+
+Therefore, numeric similarity alone must never control the final
+decision.
+
+
+============================================================
+31. EXPLAINABLE AI
+============================================================
+
+Every AI match should explain WHY it made the recommendation.
+
+Example:
+
+MATCH RECOMMENDATION
+
+Material A:
+M-PIPE-00772
+
+Material B:
+M-PIPE-00923
+
+
+Semantic similarity:
+96.4%
+
+
+Technical comparison:
+
+Material Type:
+PIPE ✓
+
+Size:
+8 IN = 203.2 MM ✓
+
+Construction:
+SEAMLESS ✓
+
+Grade:
+A106 Gr.B = ASTM A106 Gr.B ✓
+
+Schedule:
+STD ✓
+
+Standard:
+B-36.10 = ASME B36.10 ✓
+
+
+Recommendation:
+
+SAME MATERIAL IDENTITY
+
+
+Explanation:
+
+"The two records describe the same pipe specification using
+different abbreviations, unit representations and standard naming."
+
+
+============================================================
+32. MATERIAL MATCHES TABLE
+============================================================
+
+material_matches
+
+id
+material_a_id
+material_b_id
+semantic_score
+attribute_score
+rule_score
+final_score
+relationship_type
+explanation
+status
+reviewed_by
+reviewed_at
+created_at
+
+
+status:
+
+PENDING
+APPROVED
+REJECTED
+MODIFIED
+
+
+============================================================
+33. HUMAN-IN-THE-LOOP
+============================================================
+
+AI should NOT blindly create national material identities.
+
+The workflow is:
+
+AI
+ ↓
+Recommendation
+ ↓
+Confidence
+ ↓
+Explanation
+ ↓
+Material Expert
+ ↓
+APPROVE / REJECT / MODIFY
+
+
+High-confidence matches may be automatically prioritized.
+
+Medium-confidence matches should enter review queue.
+
+Low-confidence matches should not be automatically harmonized.
+
+
+============================================================
+34. EXPERT REVIEW PAGE
+============================================================
+
+The page should display two materials side-by-side.
+
+LEFT:
+
+CPCL
+M-PIPE-00772
+
+PIPE 8 BE, SEAMLESS,
+A106 Gr.B, STD
+
+
+RIGHT:
+
+IOCL
+M-PIPE-00923
+
+SMLS PIPE / 8"/ STD /
+A 106 Gr.B
+
+
+Below:
+
+ATTRIBUTE COMPARISON
+
+Type:
+PIPE              PIPE            MATCH
+
+Size:
+8 INCH            203.2 MM        MATCH
+
+Grade:
+A106 Gr.B         A106 Gr.B       MATCH
+
+Construction:
+SEAMLESS          SMLS            MATCH
+
+Standard:
+B36.10            ASME B36.10     MATCH
+
+
+AI SCORE:
+96.4%
+
+RECOMMENDATION:
+SAME
+
+
+Buttons:
+
+[ APPROVE ]
+[ REJECT ]
+[ MODIFY ]
+[ SEND FOR FURTHER REVIEW ]
+
+
+============================================================
+35. NATIONAL MATERIAL MASTER
+============================================================
+
+After expert approval:
+
+Create:
+
+National Material:
+
+NM-000001
+
+
+Canonical Description:
+
+8 INCH SEAMLESS CARBON STEEL PIPE
+ASTM A106 GRADE B
+SCHEDULE STD
+ASME B36.10
+
+
+National Material record contains:
+
+id
+national_material_code
+canonical_description
+material_type
+material_group
+status
+created_by
+approved_by
+approved_at
+created_at
+updated_at
+
+
+============================================================
+36. MATERIAL MAPPING
+============================================================
+
+material_mappings
+
+id
+national_material_id
+material_id
+cpse_id
+mapping_type
+confidence_score
+approved_by
+approved_at
+created_at
+
+
+Example:
+
+National Material:
+NM-000001
+
+
+Mappings:
+
+CPCL → M-PIPE-00772
+IOCL → M-PIPE-00923
+BPCL → M-PIPE-01221
+
+
+This allows legacy systems to retain their original codes while
+CANONIX establishes a common national identity.
+
+
+============================================================
+37. NATIONAL MATERIAL SEARCH
+============================================================
+
+Create a powerful search page.
+
+User can search:
+
+"8 inch seamless carbon steel pipe"
+
+
+CANONIX should return:
+
+NM-000001
+
+8 INCH SEAMLESS CARBON STEEL PIPE
+ASTM A106 GRADE B
+SCHEDULE STD
+ASME B36.10
+
+
+Associated codes:
+
+CPCL:
+M-PIPE-00772
+
+IOCL:
+M-PIPE-00923
+
+BPCL:
+M-PIPE-01221
+
+
+Search should support:
+
+- Exact code
+- Description
+- Natural language
+- Technical attributes
+- Standard
+- Grade
+- Size
+- CPSE
+- National code
+
+
+============================================================
+38. PROCUREMENT DATA
+============================================================
+
+Material master and procurement history should be treated as
+separate concepts.
+
+Do NOT permanently store procurement transaction data inside the
+main materials table.
+
+Create future table:
+
+procurement_transactions
+
+id
+cpse_id
+material_id
+po_number
+supplier_id
+order_quantity
+unit_price
+currency
+order_date
+plant
+created_at
+
+
+Example:
+
+CPCL
+M-PIPE-00772
+PO-2026-001
+ABC Supplier
+1200
+₹850
+2026-04-12
+
+
+============================================================
+39. PROCUREMENT INTELLIGENCE
+============================================================
+
+Once materials from multiple CPSEs are mapped to National Material
+IDs, aggregate procurement demand.
+
+Example:
+
+National Material:
+
+NM-000001
+
+
+CPCL:
+500 units
+
+IOCL:
+700 units
+
+BPCL:
+300 units
+
+HPCL:
+800 units
+
+
+National demand:
+
+2,300 units
+
+
+CANONIX can display:
+
+Potential aggregation opportunity:
+2,300 units
+
+
+This can support:
+
+- Bulk procurement
+- Demand aggregation
+- Supplier negotiations
+- Strategic sourcing
+- Duplicate procurement reduction
+
+
+============================================================
+40. PROCUREMENT ANALYST DASHBOARD
+============================================================
+
+Dashboard cards:
+
+Total National Materials
+
+Total CPSE Materials
+
+Duplicates Detected
+
+Materials Harmonized
+
+Pending Reviews
+
+National Procurement Demand
+
+Potential Procurement Opportunities
+
+Estimated Duplicate Reduction
+
+
+Charts:
+
+1. Materials by CPSE
+2. Materials by category
+3. Harmonization status
+4. Duplicate distribution
+5. National demand
+6. Supplier distribution
+7. Price trends
+8. Procurement opportunities
+
+
+============================================================
+41. DUPLICATE PREVENTION
+============================================================
+
+CANONIX should not only fix old data.
+
+It should prevent future duplication.
+
+Feature:
+
+MATERIAL CREATION COPILOT
+
+
+User enters:
+
+"Need 8 inch seamless carbon steel pipe,
+A106 Grade B, Schedule STD."
+
+
+CANONIX searches the National Material Master.
+
+If found:
+
+"Potential existing material found."
+
+NM-000001
+
+8 INCH SEAMLESS CARBON STEEL PIPE
+ASTM A106 GRADE B
+SCHEDULE STD
+ASME B36.10
+
+
+Message:
+
+"Creating a new material may create a duplicate identity."
+
+
+Options:
+
+[ USE EXISTING MATERIAL ]
+[ REQUEST NEW MATERIAL ]
+[ VIEW SIMILAR MATERIALS ]
+
+
+============================================================
+42. CANONICAL DESCRIPTION GENERATION
+============================================================
+
+CANONIX should generate standardized descriptions.
+
+Input:
+
+PIPE 8 BE, SEAMLESS, A106 Gr.B, STD
+PIPE 8 INCH BE, SEAMLESS, ASTM A106 Gr.B,
+SCH.STD, B-36.10
+
+
+Output:
+
+8 INCH SEAMLESS CARBON STEEL PIPE
+ASTM A106 GRADE B
+SCHEDULE STD
+ASME B36.10
+
+
+Canonical description should follow configurable ordering rules.
+
+Example:
+
+[TYPE]
+[SIZE]
+[MATERIAL]
+[GRADE]
+[CONSTRUCTION]
+[SCHEDULE]
+[PRESSURE]
+[CONNECTION]
+[STANDARD]
+
+
+============================================================
+43. NORMALIZATION DICTIONARY
+============================================================
+
+Create configurable normalization rules.
+
+Examples:
+
+CS → CARBON STEEL
+C.S. → CARBON STEEL
+
+SS → STAINLESS STEEL
+S.S. → STAINLESS STEEL
+
+SMLS → SEAMLESS
+SEAMLS → SEAMLESS
+
+VL → VALVE
+VLVE → VALVE
+
+FLNG → FLANGE
+ELBO → ELBOW
+
+CL300 → CLASS 300
+CL 300 → CLASS 300
+300# → CLASS 300
+
+B36.10 → ASME B36.10
+B-36.10 → ASME B36.10
+
+
+Rules must be stored in the database and manageable by Super Admin.
+
+
+============================================================
+44. AUDIT LOGGING
+============================================================
+
+Every important action must be logged.
+
+audit_logs
+
+id
+user_id
+action
+entity_type
+entity_id
+old_value
+new_value
+timestamp
+ip_address
+
+
+Examples:
+
+LOGIN
+UPLOAD_FILE
+IMPORT_MATERIAL
+NORMALIZE_MATERIAL
+GENERATE_MATCH
+APPROVE_MATCH
+REJECT_MATCH
+MODIFY_MATCH
+CREATE_NATIONAL_MATERIAL
+MAP_LEGACY_CODE
+UPDATE_RULE
+
+
+Example:
+
+User:
+Material Expert
+
+Action:
+APPROVE_MATCH
+
+Material A:
+M-PIPE-00772
+
+Material B:
+M-PIPE-00923
+
+Decision:
+SAME
+
+Timestamp:
+...
+
+
+============================================================
+45. FRONTEND PAGE STRUCTURE
+============================================================
+
+PUBLIC:
+
+/login
+/forgot-password
+
+
+SUPER ADMIN:
+
+/admin/dashboard
+/admin/cpses
+/admin/users
+/admin/uploads
+/admin/materials
+/admin/matches
+/admin/national-materials
+/admin/taxonomy
+/admin/rules
+/admin/analytics
+/admin/audit-logs
+/admin/settings
+
+
+CPSE ADMIN:
+
+/dashboard
+/materials
+/materials/[id]
+/upload
+/uploads
+/validation
+/harmonization
+/matches
+/matches/[id]
+/national-mappings
+/procurement
+/reports
+/profile
+
+
+MATERIAL EXPERT:
+
+/expert/dashboard
+/expert/review-queue
+/expert/matches/[id]
+/expert/material-comparison
+/expert/national-materials
+/expert/approvals
+/expert/history
+
+
+PROCUREMENT ANALYST:
+
+/procurement/dashboard
+/procurement/national-demand
+/procurement/material-analysis
+/procurement/suppliers
+/procurement/opportunities
+/procurement/reports
+
+
+SHARED:
+
+/search
+/national-materials
+/material-creation-copilot
+/notifications
+/profile
+
+
+============================================================
+46. CPSE DASHBOARD
+============================================================
+
+For CPCL:
+
+HEADER:
+
+CANONIX
+
+CPCL
+Chennai Petroleum Corporation Limited
+
+
+Cards:
+
+Total Materials
+12,000
+
+Processed
+10,850
+
+Pending
+1,150
+
+Matches Found
+2,340
+
+National Mappings
+1,890
+
+
+Sections:
+
+Recent Uploads
+Recent AI Matches
+Pending Reviews
+Data Quality
+Harmonization Progress
+
+
+============================================================
+47. SUPER ADMIN DASHBOARD
+============================================================
+
+Cards:
+
+Total CPSEs
+Total Materials
+National Materials
+Potential Duplicates
+Harmonized Materials
+Pending Expert Reviews
+
+
+Map/visualization:
+
+CPSE Material Distribution
+
+
+Charts:
+
+CPSE comparison
+Material categories
+Harmonization rate
+Duplicate rate
+Data quality
+
+
+============================================================
+48. DATA QUALITY DASHBOARD
+============================================================
+
+Show:
+
+Missing descriptions
+Missing UOM
+Duplicate material codes
+Unknown abbreviations
+Unrecognized standards
+Incomplete attributes
+Low extraction confidence
+
+
+Data quality score:
+
+Example:
+
+CPCL:
+87.4%
+
+IOCL:
+91.2%
+
+BPCL:
+83.7%
+
+
+============================================================
+49. AI PIPELINE
+============================================================
+
+The complete AI pipeline:
+
+RAW DESCRIPTION
+        ↓
+TEXT CLEANING
+        ↓
+ABBREVIATION NORMALIZATION
+        ↓
+UNIT NORMALIZATION
+        ↓
+ATTRIBUTE EXTRACTION
+        ↓
+MATERIAL DNA
+        ↓
+CANONICAL DESCRIPTION
+        ↓
+EMBEDDING GENERATION
+        ↓
+VECTOR SEARCH
+        ↓
+TOP-K CANDIDATES
+        ↓
+ATTRIBUTE COMPARISON
+        ↓
+ENGINEERING RULE ENGINE
+        ↓
+HYBRID SCORE
+        ↓
+RELATIONSHIP CLASSIFICATION
+        ↓
+EXPLANATION GENERATION
+        ↓
+HUMAN REVIEW
+        ↓
+NATIONAL MATERIAL ID
+
+
+============================================================
+50. AI COMPONENT RESPONSIBILITIES
+============================================================
+
+spaCy:
+
+Extract technical terms and entities.
+
+Sentence Transformers:
+
+Understand semantic similarity.
+
+Regex:
+
+Extract patterns such as:
+
+8 INCH
+8"
+DN200
+CL300
+M16
+A106 Gr.B
+B36.10
+
+
+Dictionaries:
+
+Normalize abbreviations and terminology.
+
+scikit-learn:
+
+Clustering
+Classification
+Evaluation
+Scoring utilities
+
+pgvector:
+
+Retrieve semantically similar materials.
+
+Rule engine:
+
+Apply engineering constraints.
+
+
+============================================================
+51. AI SHOULD NOT BE A BLACK BOX
+============================================================
+
+Every AI decision should contain:
+
+Input
+Extracted attributes
+Normalized attributes
+Candidate materials
+Semantic score
+Attribute score
+Rule score
+Final score
+Decision
+Explanation
+
+
+This is important because this is an industrial/governance use case.
+
+The system should assist experts rather than blindly replace them.
+
+
+============================================================
+52. ACTIVE LEARNING
+============================================================
+
+Expert decisions should improve the system.
+
+Example:
+
+AI:
+SAME
+
+Expert:
+REJECT
+
+System stores:
+
+AI prediction:
+SAME
+
+Expert correction:
+DIFFERENT
+
+This feedback becomes training/evaluation data.
+
+Over time:
+
+AI
+ ↓
+Expert
+ ↓
+Feedback
+ ↓
+Improved rules/model
+ ↓
+Better AI
+ ↓
+Expert
+ ↓
+Feedback
+
+
+============================================================
+53. MATERIAL KNOWLEDGE GRAPH
+============================================================
+
+Advanced feature.
+
+Represent relationships:
+
+CPCL
+   |
+   | owns
+   ↓
+M-PIPE-00772
+   |
+   | mapped_to
+   ↓
+NM-000001
+   |
+   | has_grade
+   ↓
+ASTM A106 Gr.B
+   |
+   | conforms_to
+   ↓
+ASME B36.10
+
+
+Other relationships:
+
+Material
+→ CPSE
+
+Material
+→ Standard
+
+Material
+→ Grade
+
+Material
+→ Manufacturer
+
+Material
+→ Application
+
+Material
+→ National Identity
+
+Material
+→ Substitute
+
+Material
+→ Procurement History
+
+
+Neo4j can be added after the core system is stable.
+
+
+============================================================
+54. NATURAL LANGUAGE MATERIAL SEARCH
+============================================================
+
+User:
+
+"Find 8 inch carbon steel seamless pipes used in refinery."
+
+CANONIX should interpret:
+
+Material Type:
+PIPE
+
+Size:
+8 INCH
+
+Material:
+CARBON STEEL
+
+Construction:
+SEAMLESS
+
+Application:
+REFINERY
+
+
+Then search Material DNA rather than simple keyword matching.
+
+
+============================================================
+55. ASK THE MATERIAL MASTER
+============================================================
+
+Advanced conversational analytics.
+
+User:
+
+"How many CPSEs use the same 8 inch A106 Grade B pipe?"
+
+System:
+
+"3 CPSEs currently have records mapped to National Material
+NM-000001."
+
+User:
+
+"What is the total annual demand?"
+
+System:
+
+"Based on available procurement records, total demand is X."
+
+
+============================================================
+56. DATA MODEL RELATIONSHIP
+============================================================
+
+ROLES
+  |
+  v
+USERS
+  |
+  v
+CPSE
+  |
+  v
+UPLOADED_FILES
+  |
+  v
+MATERIALS
+  |
+  +--------------------+
+  |                    |
+  v                    v
+MATERIAL_ATTRIBUTES  MATERIAL_EMBEDDINGS
+  |                    |
+  +---------+----------+
+            |
+            v
+      MATERIAL_MATCHES
+            |
+            v
+       HUMAN REVIEW
+            |
+            v
+   NATIONAL_MATERIALS
+            |
+            v
+    MATERIAL_MAPPINGS
+            |
+            v
+  CPSE LEGACY MATERIALS
+
+
+AUDIT_LOGS monitor all important actions.
+
+
+============================================================
+57. DATABASE RELATIONSHIP DETAILS
+============================================================
+
+cpse 1 ──────── N users
+
+role 1 ──────── N users
+
+cpse 1 ──────── N uploaded_files
+
+uploaded_file 1 ──────── N materials
+
+cpse 1 ──────── N materials
+
+material 1 ──────── N material_attributes
+
+material 1 ──────── N material_embeddings
+
+material N ──────── N material
+through material_matches
+
+national_material 1 ──────── N material_mappings
+
+material 1 ──────── N material_mappings
+
+user 1 ──────── N audit_logs
+
+
+============================================================
+58. API ARCHITECTURE
+============================================================
+
+AUTH:
+
+POST /api/auth/login
+POST /api/auth/logout
+GET  /api/auth/me
+
+
+USERS:
+
+GET    /api/users
+POST   /api/users
+GET    /api/users/{id}
+PUT    /api/users/{id}
+DELETE /api/users/{id}
+
+
+CPSE:
+
+GET  /api/cpses
+POST /api/cpses
+GET  /api/cpses/{id}
+PUT  /api/cpses/{id}
+
+
+UPLOAD:
+
+POST /api/uploads/material-master
+GET  /api/uploads
+GET  /api/uploads/{id}
+GET  /api/uploads/{id}/validation
+
+
+MATERIALS:
+
+GET  /api/materials
+GET  /api/materials/{id}
+POST /api/materials
+PUT  /api/materials/{id}
+
+
+NORMALIZATION:
+
+POST /api/materials/{id}/normalize
+POST /api/materials/batch-normalize
+
+
+ATTRIBUTES:
+
+GET /api/materials/{id}/attributes
+POST /api/materials/{id}/extract-attributes
+
+
+EMBEDDINGS:
+
+POST /api/materials/{id}/embedding
+POST /api/materials/batch-embeddings
+
+
+MATCHING:
+
+POST /api/matching/start
+GET /api/matches
+GET /api/matches/{id}
+POST /api/matches/{id}/approve
+POST /api/matches/{id}/reject
+POST /api/matches/{id}/modify
+
+
+NATIONAL MATERIAL:
+
+GET /api/national-materials
+GET /api/national-materials/{id}
+POST /api/national-materials
+PUT /api/national-materials/{id}
+
+
+MAPPING:
+
+GET /api/mappings
+POST /api/mappings
+
+
+SEARCH:
+
+GET /api/search/materials
+GET /api/search/national-materials
+
+
+ANALYTICS:
+
+GET /api/analytics/dashboard
+GET /api/analytics/cpse
+GET /api/analytics/harmonization
+GET /api/analytics/procurement
+
+
+AUDIT:
+
+GET /api/audit-logs
+
+
+============================================================
+59. API SECURITY
+============================================================
+
+Every protected API must verify:
+
+Authentication
+Role
+CPSE ownership
+
+Example:
+
+GET /api/materials/{id}
+
+Backend must verify:
+
+if user is CPSE_ADMIN:
+    material.cpse_id must equal user.cpse_id
+
+if user is SUPER_ADMIN:
+    allow
+
+if user is MATERIAL_EXPERT:
+    allow according to review scope
+
+Never trust cpse_id sent from frontend.
+
+
+============================================================
+60. FILE PROCESSING
+============================================================
+
+Use Pandas/openpyxl.
+
+Pipeline:
+
+Excel
+ ↓
+Read workbook
+ ↓
+Identify sheet
+ ↓
+Validate headers
+ ↓
+Validate row values
+ ↓
+Normalize basic formatting
+ ↓
+Generate validation report
+ ↓
+Store valid records
+ ↓
+Store invalid records/errors
+
+
+Do not silently discard invalid rows.
+
+Keep validation errors.
+
+
+============================================================
+61. DATASET FOR DEVELOPMENT
+============================================================
+
+Development dataset:
+
+CPCL raw material master
+
+12,000+ records.
+
+Raw format:
+
+Material Code
+Description
+Order Qty
+UOM
+
+
+The descriptions should intentionally contain:
+
+- Abbreviations
+- Different word orders
+- Different units
+- Technical standards
+- Grades
+- Size formats
+- Pressure classes
+- Typographical variations
+- Missing information
+- Duplicate-like records
+- Near duplicate records
+
+
+Examples:
+
+SMLS
+SEAMLESS
+
+CS
+C.S.
+CARBON STEEL
+
+CL300
+CL 300
+CLASS 300
+300#
+
+B36.10
+B-36.10
+ASME B36.10
+
+8"
+8 IN
+8 INCH
+203.2 MM
+
+
+============================================================
+62. CROSS-CPSE TEST DATA
+============================================================
+
+For AI matching tests, eventually create separate files:
+
+CPCL_material_master.xlsx
+IOCL_material_master.xlsx
+BPCL_material_master.xlsx
+HPCL_material_master.xlsx
+
+
+Each CPSE should contain its own codes.
+
+Example:
+
+CPCL:
+M-PIPE-00772
+
+IOCL:
+M-PIPE-00923
+
+BPCL:
+M-PIPE-01221
+
+
+CANONIX should identify them as:
+
+NM-000001
+
+
+============================================================
+63. IMPORTANT DATASET PRINCIPLE
+============================================================
+
+Do NOT put CPSE name inside an individual CPSE upload file.
+
+The database adds:
+
+cpse_id
+
+
+Therefore:
+
+CPCL upload:
+
+Material Code
+Description
+Order Qty
+UOM
+
+
+Database:
+
+cpse_id = CPCL
+
+
+IOCL upload:
+
+Material Code
+Description
+Order Qty
+UOM
+
+
+Database:
+
+cpse_id = IOCL
+
+
+The central system can then compare records.
+
+
+============================================================
+64. DEVELOPMENT PHASES
+============================================================
+
+PHASE 1:
+PROJECT FOUNDATION
+
+Build:
+
+Next.js
+FastAPI
+PostgreSQL
+Docker
+Git
+
+
+PHASE 2:
+AUTHENTICATION
+
+Build:
+
+Login
+JWT/session
+Roles
+CPSE association
+Protected routes
+RBAC
+
+
+PHASE 3:
+CPSE MANAGEMENT
+
+Build:
+
+CPSE table
+Super Admin CPSE management
+User management
+
+
+PHASE 4:
+MATERIAL UPLOAD
+
+Build:
+
+Excel upload
+CSV support
+Validation
+Preview
+Import
+Upload history
+
+
+PHASE 5:
+MATERIAL MASTER
+
+Build:
+
+Material list
+Material detail
+Filtering
+Search
+Pagination
+
+
+PHASE 6:
+NORMALIZATION
+
+Build:
+
+Dictionary
+Regex
+Unit conversion
+Abbreviation normalization
+
+
+PHASE 7:
+MATERIAL DNA
+
+Build:
+
+Attribute extraction
+Attribute storage
+Confidence scores
+
+
+PHASE 8:
+EMBEDDINGS
+
+Build:
+
+Sentence Transformer
+Embedding generation
+pgvector
+
+
+PHASE 9:
+MATCHING
+
+Build:
+
+Candidate retrieval
+Semantic score
+Attribute score
+Rules
+Hybrid score
+
+
+PHASE 10:
+EXPLAINABLE AI
+
+Build:
+
+Comparison UI
+Attribute-level explanations
+Confidence
+
+
+PHASE 11:
+EXPERT REVIEW
+
+Build:
+
+Review queue
+Approve
+Reject
+Modify
+Audit
+
+
+PHASE 12:
+NATIONAL MATERIAL MASTER
+
+Build:
+
+National IDs
+Canonical descriptions
+Legacy mapping
+
+
+PHASE 13:
+PROCUREMENT INTELLIGENCE
+
+Build:
+
+Procurement history
+Demand aggregation
+Supplier analytics
+Opportunity detection
+
+
+PHASE 14:
+ADVANCED FEATURES
+
+Build:
+
+Material Creation Copilot
+Duplicate prevention
+Knowledge graph
+Natural language search
+Ask Material Master
+Active learning
+
+
+============================================================
+65. FIRST DEVELOPMENT MILESTONE
+============================================================
+
+DO NOT START WITH AI.
+
+First build:
+
+LOGIN
+    ↓
+CPCL DASHBOARD
+    ↓
+UPLOAD EXCEL
+    ↓
+VALIDATE
+    ↓
+IMPORT
+    ↓
+POSTGRESQL
+    ↓
+MATERIAL LIST
+
+
+The first successful demo should be:
+
+1. CPCL Admin logs in.
+2. Dashboard opens.
+3. CPCL uploads 12,000-row Excel.
+4. System validates file.
+5. System shows valid/invalid counts.
+6. User imports valid records.
+7. PostgreSQL stores records.
+8. CPCL material page displays records.
+9. User can search/filter materials.
+
+
+Only after this works should AI development begin.
+
+
+============================================================
+66. SECOND DEVELOPMENT MILESTONE
+============================================================
+
+Raw description:
+
+PIPE 8 BE, SEAMLESS, A106 Gr.B, STD
+PIPE 8 INCH BE, SEAMLESS, ASTM A106 Gr.B,
+SCH.STD, B-36.10
+
+
+CANONIX:
+
+Extract attributes
+    ↓
+Normalize
+    ↓
+Material DNA
+
+
+Display:
+
+TYPE:
+PIPE
+
+SIZE:
+203.2 MM
+
+GRADE:
+ASTM A106 Gr.B
+
+CONSTRUCTION:
+SEAMLESS
+
+SCHEDULE:
+STD
+
+END:
+BE
+
+STANDARD:
+ASME B36.10
+
+
+============================================================
+67. THIRD DEVELOPMENT MILESTONE
+============================================================
+
+Create two materials:
+
+A:
+2 IN CS GATE VALVE CL300
+
+B:
+50.8 MM CARBON STEEL GATE VALVE CLASS 300
+
+
+System:
+
+Embedding similarity
++
+Attribute matching
++
+Engineering rules
+
+
+Output:
+
+SAME
+
+Confidence:
+95%
+
+
+============================================================
+68. FOURTH DEVELOPMENT MILESTONE
+============================================================
+
+Add another CPSE.
+
+CPCL:
+
+M-PIPE-00772
+
+
+IOCL:
+
+M-PIPE-00923
+
+
+CANONIX:
+
+Candidate match
+
+
+Expert:
+
+APPROVE
+
+
+System creates:
+
+NM-000001
+
+
+Mappings:
+
+CPCL → M-PIPE-00772
+IOCL → M-PIPE-00923
+
+
+============================================================
+69. FIFTH DEVELOPMENT MILESTONE
+============================================================
+
+Procurement intelligence.
+
+CPCL:
+500
+
+IOCL:
+700
+
+BPCL:
+300
+
+HPCL:
+800
+
+
+National demand:
+
+2,300
+
+
+Dashboard:
+
+Potential national procurement opportunity.
+
+
+============================================================
+70. UI DESIGN
+============================================================
+
+The UI should look like an enterprise industrial platform.
+
+Do NOT make it look like a generic student CRUD application.
+
+Design language:
+
+Professional
+Minimal
+Industrial
+Data-driven
+Clean
+Modern
+Trustworthy
+
+
+Use:
+
+Dark/neutral sidebar
+Light content area
+Cards
+Tables
+Charts
+Status badges
+Progress indicators
+AI confidence indicators
+
+
+Main navigation:
+
+Dashboard
+Materials
+Upload Data
+Validation
+Harmonization
+AI Matches
+National Materials
+Procurement
+Reports
+Audit
+
+
+============================================================
+71. MATERIAL DETAIL PAGE
+============================================================
+
+Show:
+
+Material Code
+Original Description
+CPSE
+UOM
+Order Quantity
+Source File
+Upload Date
+
+
+Then:
+
+NORMALIZED DESCRIPTION
+
+
+Then:
+
+MATERIAL DNA
+
+
+Attributes:
+
+Type
+Size
+Material
+Grade
+Schedule
+Pressure
+Connection
+Standard
+Application
+
+
+Then:
+
+AI MATCHES
+
+
+Then:
+
+NATIONAL MATERIAL
+
+
+Then:
+
+AUDIT HISTORY
+
+
+============================================================
+72. MATCH COMPARISON UI
+============================================================
+
+Use side-by-side comparison.
+
+Material A
+versus
+Material B
+
+
+Show:
+
+Raw description
+Normalized description
+Material DNA
+Attribute comparison
+Semantic similarity
+Attribute score
+Rule score
+Final score
+
+
+Highlight:
+
+MATCH
+MISMATCH
+UNKNOWN
+
+
+Example:
+
+Size:
+8 INCH = 203.2 MM
+MATCH
+
+
+Pressure:
+CLASS 300 ≠ CLASS 150
+MISMATCH
+
+
+============================================================
+73. STATUS SYSTEM
+============================================================
+
+Material status:
+
+IMPORTED
+NORMALIZED
+ATTRIBUTES_EXTRACTED
+EMBEDDED
+MATCHED
+REVIEW_PENDING
+HARMONIZED
+REJECTED
+LEGACY
+ARCHIVED
+
+
+Match status:
+
+PENDING
+APPROVED
+REJECTED
+MODIFIED
+
+
+National material status:
+
+DRAFT
+PENDING_APPROVAL
+APPROVED
+ACTIVE
+DEPRECATED
+RETIRED
+
+
+============================================================
+74. DATA GOVERNANCE
+============================================================
+
+CANONIX must provide:
+
+Traceability
+Auditability
+Human approval
+Versioning
+Role-based access
+Original data preservation
+Explainable decisions
+
+
+Every canonical material must be traceable to:
+
+National Material ID
+    ↓
+CPSE mappings
+    ↓
+Original material codes
+    ↓
+Source files
+    ↓
+Original descriptions
+
+
+============================================================
+75. NON-FUNCTIONAL REQUIREMENTS
+============================================================
+
+SECURITY:
+
+- Password hashing
+- JWT/session security
+- RBAC
+- API authorization
+- Input validation
+- File validation
+- SQL injection protection
+- Secure file handling
+
+
+PERFORMANCE:
+
+- Pagination
+- Database indexes
+- Vector indexes
+- Batch processing
+- Async processing for large uploads
+- Background AI jobs
+
+
+SCALABILITY:
+
+The architecture should support:
+
+Thousands of materials
+Hundreds of thousands of materials
+Millions of material records eventually
+
+
+RELIABILITY:
+
+Failed AI jobs must be retryable.
+
+Failed uploads must not corrupt existing data.
+
+Use transaction handling.
+
+
+AUDITABILITY:
+
+All important modifications must be logged.
+
+
+============================================================
+76. DATABASE INDEXES
+============================================================
+
+Create indexes on:
+
+materials.cpse_id
+materials.material_code
+materials.uploaded_file_id
+
+material_attributes.material_id
+material_attributes.attribute_name
+
+material_matches.material_a_id
+material_matches.material_b_id
+material_matches.status
+
+material_mappings.national_material_id
+material_mappings.cpse_id
+
+users.email
+
+uploaded_files.cpse_id
+
+Also create appropriate pgvector indexes for embeddings.
+
+
+============================================================
+77. DATA VALIDATION RULES
+============================================================
+
+Material Code:
+
+Required
+Unique within CPSE
+
+
+Description:
+
+Required
+Non-empty
+
+
+UOM:
+
+Required
+
+
+Order Quantity:
+
+Numeric
+Non-negative
+
+
+File:
+
+Allowed:
+
+.xlsx
+.xls
+.csv
+
+
+Reject:
+
+Executable files
+Unknown file types
+Oversized files
+
+
+============================================================
+78. ERROR HANDLING
+============================================================
+
+Example:
+
+UPLOAD ERROR
+
+Missing required columns:
+
+Description
+UOM
+
+
+Do not import.
+
+
+Another:
+
+INVALID RECORDS
+
+Row 23:
+Material Code missing
+
+Row 87:
+Invalid quantity
+
+Row 91:
+UOM missing
+
+
+Allow valid records to continue if configured.
+
+Provide downloadable error report eventually.
+
+
+============================================================
+79. AI CONFIDENCE
+============================================================
+
+Every extracted attribute should have confidence.
+
+Example:
+
+Grade:
+ASTM A106 Gr.B
+Confidence:
+0.98
+
+
+Size:
+203.2 MM
+Confidence:
+0.96
+
+
+Standard:
+ASME B36.10
+Confidence:
+0.94
+
+
+This helps experts identify uncertain extraction.
+
+
+============================================================
+80. AI EVALUATION
+============================================================
+
+Evaluate:
+
+Precision
+Recall
+F1
+Top-1 accuracy
+Top-5 accuracy
+
+Attribute extraction:
+
+Precision
+Recall
+F1
+
+Data quality:
+
+Missing attribute reduction
+Normalization accuracy
+
+
+Business metrics:
+
+Duplicate reduction
+Harmonization rate
+Review time reduction
+National demand aggregation
+
+
+============================================================
+81. DEMO SCENARIO FOR SIH
+============================================================
+
+The complete demonstration should be:
+
+STEP 1:
+
+Login as CPCL Admin.
+
+
+STEP 2:
+
+Upload:
+
+CPCL_material_master.xlsx
+
+
+STEP 3:
+
+System validates:
+
+12,000 records.
+
+
+STEP 4:
+
+Dashboard shows:
+
+12,000 imported.
+
+
+STEP 5:
+
+System starts normalization.
+
+
+STEP 6:
+
+Open material:
+
+M-PIPE-00772
+
+
+Raw:
+
+PIPE 8 BE, SEAMLESS, A106 Gr.B, STD
+PIPE 8 INCH BE, SEAMLESS, ASTM A106 Gr.B,
+SCH.STD, B-36.10
+
+
+STEP 7:
+
+CANONIX creates Material DNA.
+
+
+STEP 8:
+
+AI finds similar IOCL material.
+
+
+STEP 9:
+
+Show side-by-side comparison.
+
+
+STEP 10:
+
+AI:
+
+96% confidence
+SAME
+
+
+STEP 11:
+
+Expert approves.
+
+
+STEP 12:
+
+CANONIX creates:
+
+NM-000001
+
+
+STEP 13:
+
+Mappings:
+
+CPCL → M-PIPE-00772
+IOCL → M-PIPE-00923
+
+
+STEP 14:
+
+Procurement dashboard shows:
+
+Combined national demand.
+
+
+STEP 15:
+
+Material Creation Copilot:
+
+User attempts to create the same material.
+
+
+CANONIX warns:
+
+"Potential existing national material found."
+
+
+This demonstrates:
+
+DATA INGESTION
++
+AI
++
+NLP
++
+ENGINEERING LOGIC
++
+HUMAN VALIDATION
++
+NATIONAL STANDARDIZATION
++
+PROCUREMENT INTELLIGENCE
+
+
+============================================================
+82. KEY INNOVATIONS
+============================================================
+
+1. MATERIAL DNA
+
+Convert messy descriptions into structured technical identity.
+
+
+2. HYBRID AI MATCHING
+
+Semantic similarity + attributes + engineering rules.
+
+
+3. EXPLAINABLE AI
+
+Show exactly why materials were matched.
+
+
+4. NATIONAL MATERIAL IDENTITY
+
+Create one common identity while preserving legacy codes.
+
+
+5. HUMAN-IN-THE-LOOP
+
+Experts control critical decisions.
+
+
+6. ACTIVE LEARNING
+
+Expert feedback improves future matching.
+
+
+7. DUPLICATE PREVENTION
+
+Prevent new duplicate material creation.
+
+
+8. MATERIAL CREATION COPILOT
+
+AI assists users before creating a new material.
+
+
+9. PROCUREMENT INTELLIGENCE
+
+Aggregate national demand after harmonization.
+
+
+10. MATERIAL KNOWLEDGE GRAPH
+
+Connect materials, CPSEs, standards, suppliers and applications.
+
+
+11. NATURAL LANGUAGE SEARCH
+
+Search material master using engineering language.
+
+
+12. DATA GOVERNANCE
+
+Complete audit trail and traceability.
+
+
+============================================================
+83. WHAT NOT TO DO
+============================================================
+
+Do NOT build only a:
+
+"duplicate material detection system."
+
+CANONIX is more than that.
+
+Do NOT rely only on:
+
+TF-IDF
+Levenshtein distance
+simple fuzzy matching
+cosine similarity
+
+
+Do NOT automatically merge materials based only on text similarity.
+
+
+Do NOT delete original CPSE descriptions.
+
+
+Do NOT require CPSE users to manually enter their CPSE during
+upload.
+
+
+Do NOT mix all CPSE data into one upload file.
+
+
+Do NOT allow CPSE users to edit other CPSE data.
+
+
+Do NOT hardcode all technical attributes into the materials table.
+
+
+Do NOT start by implementing every advanced feature.
+
+
+Build the core pipeline first.
+
+
+============================================================
+84. FINAL CANONIX PIPELINE
+============================================================
+
+CPSE LOGIN
+    ↓
+ROLE + CPSE IDENTIFICATION
+    ↓
+UPLOAD MATERIAL MASTER
+    ↓
+FILE VALIDATION
+    ↓
+RAW MATERIAL STORAGE
+    ↓
+DATA QUALITY CHECK
+    ↓
+TEXT CLEANING
+    ↓
+ABBREVIATION NORMALIZATION
+    ↓
+UNIT NORMALIZATION
+    ↓
+ATTRIBUTE EXTRACTION
+    ↓
+MATERIAL DNA
+    ↓
+CANONICAL DESCRIPTION
+    ↓
+SENTENCE TRANSFORMER EMBEDDING
+    ↓
+PGVECTOR SEARCH
+    ↓
+TOP-K CANDIDATES
+    ↓
+ATTRIBUTE COMPARISON
+    ↓
+ENGINEERING RULE ENGINE
+    ↓
+HYBRID SCORE
+    ↓
+RELATIONSHIP CLASSIFICATION
+    ↓
+EXPLAINABLE RECOMMENDATION
+    ↓
+MATERIAL EXPERT REVIEW
+    ↓
+APPROVE / REJECT / MODIFY
+    ↓
+NATIONAL MATERIAL IDENTITY
+    ↓
+LEGACY CPSE CODE MAPPING
+    ↓
+NATIONAL MATERIAL MASTER
+    ↓
+PROCUREMENT AGGREGATION
+    ↓
+PROCUREMENT OPPORTUNITY
+    ↓
+DUPLICATE PREVENTION
+
+
+============================================================
+85. RECOMMENDED PROJECT DIRECTORY
+============================================================
+
+CANONIX/
+
+frontend/
+    app/
+    components/
+    features/
+    hooks/
+    lib/
+    services/
+    types/
+
+backend/
+    app/
+        main.py
+
+        api/
+            auth.py
+            users.py
+            cpses.py
+            uploads.py
+            materials.py
+            normalization.py
+            attributes.py
+            embeddings.py
+            matching.py
+            national_materials.py
+            procurement.py
+            analytics.py
+            audit.py
+
+        models/
+            user.py
+            role.py
+            cpse.py
+            uploaded_file.py
+            material.py
+            material_attribute.py
+            material_embedding.py
+            material_match.py
+            national_material.py
+            material_mapping.py
+            audit_log.py
+
+        schemas/
+
+        services/
+            auth_service.py
+            upload_service.py
+            validation_service.py
+            normalization_service.py
+            attribute_extraction_service.py
+            embedding_service.py
+            matching_service.py
+            explanation_service.py
+            national_material_service.py
+            procurement_service.py
+
+        ai/
+            nlp/
+            embeddings/
+            matching/
+            rules/
+
+        database/
+            session.py
+            base.py
+
+        core/
+            config.py
+            security.py
+
+        utils/
+
+    migrations/
+
+data/
+    cpcl/
+    iocl/
+    bpcl/
+    hpcl/
+    test/
+
+docs/
+    architecture/
+    database/
+    api/
+    ai/
+
+docker/
+    Dockerfile.backend
+    Dockerfile.frontend
+
+docker-compose.yml
+
+README.md
+
+
+============================================================
+86. CODING PRINCIPLES
+============================================================
+
+Use:
+
+Clean architecture
+Modular services
+Type safety
+Environment variables
+Reusable components
+Reusable API services
+Database migrations
+Proper error handling
+Logging
+
+
+Do not place everything in one file.
+
+Keep:
+
+Frontend
+Backend
+AI
+Database
+Services
+
+separate.
+
+
+============================================================
+87. ENVIRONMENT VARIABLES
+============================================================
+
+Backend:
+
+DATABASE_URL
+JWT_SECRET
+JWT_EXPIRATION
+EMBEDDING_MODEL
+VECTOR_DIMENSION
+
+
+Frontend:
+
+NEXT_PUBLIC_API_URL
+
+
+Never hardcode passwords, API keys or secrets.
+
+
+============================================================
+88. DEVELOPMENT ORDER
+============================================================
+
+START HERE:
+
+1. Create repository.
+
+2. Create Next.js frontend.
+
+3. Create FastAPI backend.
+
+4. Configure PostgreSQL.
+
+5. Configure Docker Compose.
+
+6. Create Alembic migrations.
+
+7. Create:
+   roles
+   cpse
+   users
+   uploaded_files
+   materials
+
+8. Create authentication.
+
+9. Implement RBAC.
+
+10. Create CPSE Admin dashboard.
+
+11. Create upload page.
+
+12. Implement Excel parsing.
+
+13. Implement validation.
+
+14. Import 12,000 CPCL records.
+
+15. Create material table UI.
+
+16. Implement search/filter/pagination.
+
+
+ONLY AFTER THIS:
+
+17. Normalization.
+
+18. Attribute extraction.
+
+19. Material DNA.
+
+20. Sentence Transformers.
+
+21. pgvector.
+
+22. Candidate retrieval.
+
+23. Hybrid matching.
+
+24. Explainable AI.
+
+25. Expert review.
+
+26. National Material Master.
+
+27. Legacy mapping.
+
+28. Procurement intelligence.
+
+29. Duplicate prevention.
+
+30. Advanced features.
+
+
+============================================================
+89. MVP DEFINITION
+============================================================
+
+The MVP must include:
+
+Authentication
+RBAC
+CPSE management
+Excel upload
+File validation
+Material storage
+Material listing
+Normalization
+Attribute extraction
+Material DNA
+Embeddings
+Vector search
+Hybrid matching
+Explainable results
+Expert approval
+National Material ID
+Legacy code mapping
+
+
+============================================================
+90. ADVANCED VERSION
+============================================================
+
+After MVP:
+
+Procurement analytics
+Supplier analytics
+Knowledge graph
+Natural language search
+Material Creation Copilot
+Duplicate prevention
+Active learning
+PDF specification extraction
+OCR
+Substitute discovery
+Material lifecycle
+Material risk score
+National procurement opportunity map
+
+
+============================================================
+91. CORE BUSINESS VALUE
+============================================================
+
+CANONIX enables:
+
+1. Standardized national material identity.
+
+2. Reduction of duplicate material records.
+
+3. Better master-data quality.
+
+4. Better inventory visibility.
+
+5. Cross-CPSE demand aggregation.
+
+6. Improved procurement efficiency.
+
+7. Strategic sourcing opportunities.
+
+8. Faster material identification.
+
+9. Better technical specification consistency.
+
+10. Easier ERP/SAP migration.
+
+11. Better governance and auditability.
+
+12. Reduced manual material comparison effort.
+
+
+============================================================
+92. MOST IMPORTANT CONCEPT
+============================================================
+
+CANONIX does NOT replace existing CPSE material codes immediately.
+
+Instead:
+
+LEGACY CPSE MATERIAL
+
+CPCL:
+M-PIPE-00772
+
+IOCL:
+M-PIPE-00923
+
+BPCL:
+M-PIPE-01221
+
+        ↓
+
+CANONIX
+
+        ↓
+
+NATIONAL MATERIAL IDENTITY
+
+NM-000001
+
+
+This allows gradual migration.
+
+The original CPSE codes remain available.
+
+Therefore:
+
+National Material
+    |
+    +--- CPCL legacy code
+    +--- IOCL legacy code
+    +--- BPCL legacy code
+    +--- HPCL legacy code
+
+
+============================================================
+93. CANONIX PRODUCT PHILOSOPHY
+============================================================
+
+CANONIX should be treated as a:
+
+"Material Identity Resolution and National Harmonization Engine"
+
+rather than simply:
+
+"Duplicate Detection Software."
+
+
+The system understands:
+
+WHAT THE MATERIAL IS
+        +
+WHAT ITS TECHNICAL SPECIFICATION IS
+        +
+HOW DIFFERENT CPSEs DESCRIBE IT
+        +
+WHETHER TWO MATERIALS ARE ACTUALLY COMPATIBLE
+        +
+WHETHER AN EXPERT APPROVES THE RELATIONSHIP
+
+
+============================================================
+94. FINAL ONE-LINE DESCRIPTION
+============================================================
+
+CANONIX is an explainable AI-powered national material identity
+resolution platform that converts heterogeneous CPSE material
+masters into standardized Material DNA, identifies identical and
+functionally equivalent materials using semantic, attribute and
+engineering intelligence, validates decisions through human experts,
+and creates a common National Material Identity while preserving
+legacy ERP codes.
+
+
+============================================================
+95. FINAL SYSTEM MANTRA
+============================================================
+
+DETECT
+    ↓
+UNDERSTAND
+    ↓
+NORMALIZE
+    ↓
+HARMONIZE
+    ↓
+EXPLAIN
+    ↓
+VALIDATE
+    ↓
+GOVERN
+    ↓
+PREVENT
+    ↓
+OPTIMIZE
+
+
+============================================================
+96. INSTRUCTION TO ANTIGRAVITY
+============================================================
+
+Build CANONIX according to this specification.
+
+Do NOT attempt to implement the entire system in one step.
+
+Implement incrementally.
+
+FIRST:
+
+Set up:
+
+- Next.js frontend
+- TypeScript
+- Tailwind CSS
+- FastAPI backend
+- PostgreSQL
+- SQLAlchemy
+- Alembic
+- Docker Compose
+
+Then implement:
+
+- Database schema
+- Authentication
+- Roles
+- CPSE isolation
+- CPSE Admin login
+- Super Admin login
+- Dashboard
+- Excel upload
+- Validation
+- Material import
+- Material listing
+
+Use the provided CPCL dummy material master dataset as the development
+dataset.
+
+The CPCL dataset contains raw records in this format:
+
+Material Code
+Description
+Order Qty
+UOM
+
+Do NOT require a CPSE column in the file.
+
+The backend must associate uploaded data with the authenticated
+user's cpse_id.
+
+After the complete upload/storage workflow works, implement the AI
+pipeline in separate modules.
+
+Do not create fake AI results.
+
+Do not hardcode matching results.
+
+The matching engine must operate on actual database records.
+
+All AI decisions must be explainable.
+
+All expert actions must be audited.
+
+Preserve raw data permanently.
+
+Use database migrations.
+
+Use environment variables for secrets.
+
+Use proper error handling.
+
+Use pagination for large datasets.
+
+Design the architecture so that the system can later scale from
+12,000 records to millions of records.
+
+Build the system as a production-quality enterprise application,
+not merely a demo CRUD application.
+
+
+============================================================
+END OF CANONIX MASTER PROJECT SPECIFICATION
+============================================================
