@@ -16,7 +16,9 @@ from app.models.user import User
 from app.core.security import get_password_hash
 
 # Use the dedicated test database
-TEST_SQLALCHEMY_DATABASE_URL = "postgresql://postgres:postgres@127.0.0.1:5432/canonix_test"
+TEST_SQLALCHEMY_DATABASE_URL = os.getenv(
+    "TEST_DATABASE_URL", "postgresql://postgres:postgres@127.0.0.1:5432/canonix_test"
+)
 
 engine = create_engine(TEST_SQLALCHEMY_DATABASE_URL)
 TestingSessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
