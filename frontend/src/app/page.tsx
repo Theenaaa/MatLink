@@ -1,50 +1,30 @@
 "use client";
 
-import { useEffect, useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import Link from "next/link";
 import { 
   ShieldCheck, 
-  Activity, 
   Database, 
   Cpu, 
   CheckCircle2, 
-  AlertCircle, 
   ArrowRight,
   GitMerge,
   Building2,
   Boxes,
   UserCheck,
   Search,
-  ExternalLink,
   ChevronDown,
-  Sparkles,
-  Lock,
   BookOpen,
-  TrendingUp,
   BarChart3,
-  Flame,
-  Zap,
   Globe,
-  Layers,
   ArrowUpRight,
   Award,
-  Play,
-  X
+  Sparkles,
+  Layers,
+  FileSpreadsheet,
+  Zap,
+  Tag
 } from "lucide-react";
-
-interface HealthStatus {
-  status: string;
-  app: string;
-  version: string;
-  description: string;
-  timestamp: string;
-  matching_weights?: {
-    semantic: number;
-    attribute: number;
-    rule: number;
-    classification: number;
-  };
-}
 
 // ── Ashoka Chakra & Government Emblem ─────────────────────────────
 const SPOKES = Array.from({ length: 24 }, (_, i) => {
@@ -186,30 +166,9 @@ function HPCLSvg() {
 }
 
 export default function HomePage() {
-  const [health, setHealth] = useState<HealthStatus | null>(null);
-  const [loading, setLoading] = useState<boolean>(true);
   const [loginDropdownOpen, setLoginDropdownOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const dropdownRef = useRef<HTMLDivElement>(null);
-
-  const apiUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
-
-  useEffect(() => {
-    async function checkHealth() {
-      try {
-        setLoading(true);
-        const res = await fetch(`${apiUrl}/health`);
-        if (!res.ok) throw new Error(`API status ${res.status}`);
-        const data = await res.json();
-        setHealth(data);
-      } catch (err: any) {
-        // Fallback status gracefully
-      } finally {
-        setLoading(false);
-      }
-    }
-    checkHealth();
-  }, [apiUrl]);
 
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
@@ -325,7 +284,7 @@ export default function HomePage() {
     {
       date: "March 2026",
       tag: "Refinery Integration",
-      title: "CPCL Manali Ingests 45,000 Line Items into Central Engine",
+      title: "Manali Refinery Operations Ingest 45,000 Line Items into Central Engine",
       desc: "Technical operations successfully validated and mapped legacy SAP ERP material records into standardized National Material DNA format.",
     },
     {
@@ -343,14 +302,14 @@ export default function HomePage() {
   ];
 
   return (
-    <div className="flex flex-col min-h-screen bg-slate-50 text-slate-900 font-sans selection:bg-sky-500 selection:text-white">
+    <div className="flex flex-col min-h-screen bg-slate-50 text-slate-900 font-sans selection:bg-amber-500 selection:text-white">
       
       {/* ── Top Government Tricolor Accent Strip ── */}
       <div className="h-1.5 w-full bg-gradient-to-r from-[#ff9933] via-white to-[#138808] z-50 sticky top-0 shadow-sm" />
 
       {/* ── Main Government & Enterprise Header ── */}
       <header className="border-b border-slate-200 bg-white/95 backdrop-blur-md sticky top-1.5 z-40 shadow-sm">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3 flex items-center justify-between">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3.5 flex items-center justify-between">
           
           {/* Left Brand Identification */}
           <div className="flex items-center gap-3.5">
@@ -358,7 +317,7 @@ export default function HomePage() {
             <div className="border-l border-slate-200 pl-3.5">
               <div className="flex items-center gap-2">
                 <span className="font-extrabold text-xl tracking-tight text-slate-900">CANONIX</span>
-                <span className="text-[10px] px-2.5 py-0.5 rounded-full bg-sky-50 border border-sky-200 text-sky-700 font-bold uppercase tracking-wider">
+                <span className="text-[10px] px-2.5 py-0.5 rounded-full bg-amber-50 border border-amber-200 text-amber-800 font-bold uppercase tracking-wider">
                   Enterprise Platform
                 </span>
               </div>
@@ -368,35 +327,22 @@ export default function HomePage() {
             </div>
           </div>
 
+          {/* Center Header Nav Links */}
+          <nav className="hidden lg:flex items-center gap-6 text-xs font-semibold text-slate-600">
+            <a href="#enterprises" className="hover:text-amber-600 transition">CPSE Directory</a>
+            <a href="#pipeline" className="hover:text-amber-600 transition">AI Pipeline Workflow</a>
+            <a href="#bulletins" className="hover:text-amber-600 transition">Gazette Circulars</a>
+            <Link href="/national-materials" className="hover:text-amber-600 transition">National Registry</Link>
+          </nav>
+
           {/* Right Controls & Login Action */}
           <div className="flex items-center gap-4">
             
-            {/* Backend Connectivity Badge */}
-            <div className="hidden md:flex items-center gap-2 px-3 py-1.5 rounded-full bg-slate-100 border border-slate-200 text-xs">
-              <span className="text-slate-500 font-medium">System Status:</span>
-              {loading ? (
-                <span className="flex items-center gap-1.5 text-amber-600 font-medium">
-                  <Activity className="w-3.5 h-3.5 animate-spin" />
-                  Connecting...
-                </span>
-              ) : health ? (
-                <span className="flex items-center gap-1.5 text-emerald-600 font-semibold">
-                  <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-                  Online (v{health.version})
-                </span>
-              ) : (
-                <span className="flex items-center gap-1.5 text-rose-600 font-semibold">
-                  <AlertCircle className="w-3.5 h-3.5" />
-                  Offline
-                </span>
-              )}
-            </div>
-
             {/* Quick Role Login Dropdown */}
             <div className="relative" ref={dropdownRef}>
               <button
                 onClick={() => setLoginDropdownOpen(!loginDropdownOpen)}
-                className="flex items-center gap-2 px-4 py-2 rounded-xl bg-gradient-to-r from-amber-500 to-orange-600 hover:from-amber-600 hover:to-orange-700 text-white font-semibold text-xs transition-all shadow-md shadow-orange-500/20 active:scale-95"
+                className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-gradient-to-r from-amber-500 to-orange-600 hover:from-amber-600 hover:to-orange-700 text-white font-semibold text-xs transition-all shadow-md shadow-orange-500/20 active:scale-95"
               >
                 <span>Sign In to Workstation</span>
                 <ChevronDown className={`w-3.5 h-3.5 transition-transform duration-200 ${loginDropdownOpen ? "rotate-180" : ""}`} />
@@ -463,10 +409,10 @@ export default function HomePage() {
       </header>
 
       {/* ── Hero Section (Deep Navy Gradient from Main Branch) ── */}
-      <section className="relative overflow-hidden pt-14 pb-20 bg-gradient-to-br from-slate-900 via-indigo-950 to-slate-900 text-white shadow-xl">
+      <section className="relative overflow-hidden pt-16 pb-20 bg-gradient-to-br from-slate-900 via-indigo-950 to-slate-950 text-white shadow-xl">
         
-        {/* Animated Glow Accents */}
-        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full max-w-7xl h-96 bg-gradient-to-r from-sky-500/20 via-amber-500/20 to-emerald-500/20 blur-3xl pointer-events-none" />
+        {/* Animated Background Flares */}
+        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full max-w-7xl h-96 bg-gradient-to-r from-amber-500/15 via-orange-500/15 to-emerald-500/15 blur-3xl pointer-events-none" />
 
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
           
@@ -474,7 +420,7 @@ export default function HomePage() {
             
             <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-white/10 border border-white/20 text-amber-300 text-xs font-semibold mb-6 shadow-sm backdrop-blur-md">
               <Award className="w-4 h-4 text-amber-300" />
-              <span>Government of India · National Automation Initiative</span>
+              <span>Government of India · National Material Master Platform</span>
             </div>
 
             <h1 className="text-4xl sm:text-5xl lg:text-6xl font-black tracking-tight leading-[1.1] mb-6">
@@ -485,7 +431,7 @@ export default function HomePage() {
               Standardizing, classifying, and unifying material master catalogues across CPCL, IOCL, ONGC, GAIL, BPCL, and HPCL into canonical Material DNA with explainable AI matching and complete legacy code preservation.
             </p>
 
-            {/* CTA Buttons */}
+            {/* CTA Action Buttons */}
             <div className="flex flex-wrap items-center gap-4">
               <Link 
                 href="/login"
@@ -503,16 +449,14 @@ export default function HomePage() {
                 <span>Role Dashboard</span>
               </Link>
 
-              <a 
-                href={`${apiUrl}/docs`}
-                target="_blank"
-                rel="noreferrer"
+              <Link 
+                href="/national-materials"
                 className="inline-flex items-center gap-2 px-5 py-3.5 rounded-xl bg-white/10 hover:bg-white/20 border border-white/20 text-white font-semibold text-sm transition-all backdrop-blur-md"
               >
-                <Cpu className="w-4 h-4 text-emerald-400" />
-                <span>API Portal</span>
+                <Database className="w-4 h-4 text-emerald-400" />
+                <span>Browse Registry</span>
                 <ArrowUpRight className="w-3.5 h-3.5 text-slate-300" />
-              </a>
+              </Link>
             </div>
 
           </div>
@@ -541,23 +485,23 @@ export default function HomePage() {
       </section>
 
       {/* ── CPSE Enterprise Directory & Access Cards ── */}
-      <section className="py-16 bg-slate-50 border-b border-slate-200">
+      <section id="enterprises" className="py-16 bg-slate-50 border-b border-slate-200">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           
           <div className="flex flex-col md:flex-row md:items-end justify-between mb-10">
             <div>
-              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-50 border border-blue-200 text-blue-700 text-xs font-semibold mb-3">
+              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-amber-50 border border-amber-200 text-amber-800 text-xs font-semibold mb-3">
                 <Building2 className="w-3.5 h-3.5" /> Participating Public Sector Enterprises
               </div>
               <h2 className="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight">
-                CPSE Enterprise Workstation Cards
+                CPSE Enterprise Workstation Directory
               </h2>
               <p className="text-slate-600 text-sm mt-1 max-w-2xl">
                 Explore participating CPSE master catalogs or access enterprise workstations for Super Admin, CPSE Admin, Material Experts, and Analysts.
               </p>
             </div>
             <div className="mt-4 md:mt-0 text-xs text-slate-500 font-mono">
-              Enterprise Data Security Active (<span className="text-blue-600">cpse_id</span>)
+              Enterprise Multi-Tenant Security Active (<span className="text-amber-700 font-bold">cpse_id</span>)
             </div>
           </div>
 
@@ -566,13 +510,13 @@ export default function HomePage() {
             {cpseList.map((cpse) => (
               <div
                 key={cpse.code}
-                className="group relative rounded-2xl border border-slate-200 bg-white p-6 transition-all duration-300 hover:shadow-2xl hover:border-blue-400 hover:-translate-y-1.5 flex flex-col justify-between"
+                className="group relative rounded-2xl border border-slate-200 bg-white p-6 transition-all duration-300 hover:shadow-2xl hover:border-amber-400 hover:-translate-y-1.5 flex flex-col justify-between"
               >
                 <div>
                   {/* Top Logo & Code Header */}
                   <div className="flex items-start justify-between gap-4 mb-4">
                     <div className="flex items-center gap-3">
-                      <div className="p-1 rounded-xl bg-slate-50 border border-slate-200 group-hover:scale-105 transition-transform duration-300 shadow-sm">
+                      <div className="p-1.5 rounded-xl bg-slate-50 border border-slate-200 group-hover:scale-105 transition-transform duration-300 shadow-sm">
                         {cpse.logo}
                       </div>
                       <div>
@@ -588,7 +532,7 @@ export default function HomePage() {
                   </div>
 
                   {/* CPSE Name & Role */}
-                  <h3 className="text-base font-bold text-slate-900 mb-1 group-hover:text-blue-700 transition-colors">
+                  <h3 className="text-base font-bold text-slate-900 mb-1 group-hover:text-amber-700 transition-colors">
                     {cpse.name}
                   </h3>
                   <p className="text-xs font-medium text-slate-500 mb-3">{cpse.role}</p>
@@ -622,7 +566,7 @@ export default function HomePage() {
       </section>
 
       {/* ── 9-Stage AI Pipeline Architecture Section ── */}
-      <section className="py-16 bg-white border-b border-slate-200">
+      <section id="pipeline" className="py-16 bg-white border-b border-slate-200">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           
           <div className="flex flex-col md:flex-row md:items-end justify-between mb-10">
@@ -646,9 +590,9 @@ export default function HomePage() {
             {pipelineStages.map((stage, idx) => (
               <div 
                 key={stage.name}
-                className="flex items-start gap-3.5 p-4 rounded-xl bg-slate-50 border border-slate-200 hover:border-blue-300 hover:shadow-md transition-all"
+                className="flex items-start gap-3.5 p-4 rounded-xl bg-slate-50 border border-slate-200 hover:border-amber-400 hover:shadow-md transition-all"
               >
-                <div className="w-8 h-8 rounded-lg bg-blue-100 border border-blue-200 flex items-center justify-center text-xs font-black text-blue-700 shrink-0">
+                <div className="w-8 h-8 rounded-lg bg-amber-100 border border-amber-200 flex items-center justify-center text-xs font-black text-amber-800 shrink-0">
                   {idx + 1}
                 </div>
                 <div>
@@ -667,7 +611,7 @@ export default function HomePage() {
       </section>
 
       {/* ── System Core Modules & Gazette Bulletins ── */}
-      <section className="py-16 bg-slate-50 border-b border-slate-200">
+      <section id="bulletins" className="py-16 bg-slate-50 border-b border-slate-200">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
@@ -684,14 +628,14 @@ export default function HomePage() {
 
               <div className="space-y-4">
                 {newsItems.map((item, idx) => (
-                  <div key={idx} className="p-5 rounded-2xl bg-white border border-slate-200 hover:border-slate-300 hover:shadow-md transition">
+                  <div key={idx} className="p-5 rounded-2xl bg-white border border-slate-200 hover:border-amber-300 hover:shadow-md transition">
                     <div className="flex items-center gap-3 text-xs mb-2">
                       <span className="px-2.5 py-0.5 rounded-full bg-amber-50 border border-amber-200 text-amber-700 font-semibold">
                         {item.tag}
                       </span>
                       <span className="text-slate-400">{item.date}</span>
                     </div>
-                    <h4 className="text-base font-bold text-slate-900 mb-1.5 hover:text-blue-600 transition cursor-pointer">
+                    <h4 className="text-base font-bold text-slate-900 mb-1.5 hover:text-amber-700 transition cursor-pointer">
                       {item.title}
                     </h4>
                     <p className="text-xs text-slate-600 leading-relaxed">
@@ -702,11 +646,11 @@ export default function HomePage() {
               </div>
             </div>
 
-            {/* Right Col: How Do I Quick Inquiry & Specs */}
+            {/* Right Col: How Do I Quick Inquiry & Search */}
             <div className="space-y-6">
               <div className="flex items-center justify-between border-b border-slate-200 pb-4">
                 <h3 className="text-xl font-bold text-slate-900 tracking-tight">Quick Catalog Search</h3>
-                <Search className="w-5 h-5 text-sky-600" />
+                <Search className="w-5 h-5 text-amber-600" />
               </div>
 
               <div className="p-6 rounded-2xl bg-white border border-slate-200 shadow-sm space-y-4">
@@ -735,7 +679,7 @@ export default function HomePage() {
                     <span className="text-slate-800 font-mono">Semantic 40% | Attr 30%</span>
                   </div>
                   <div className="flex items-center justify-between">
-                    <span>AI Model:</span>
+                    <span>AI Embedding:</span>
                     <span className="text-slate-800 font-mono">all-MiniLM-L6-v2 (384d)</span>
                   </div>
                 </div>
@@ -789,7 +733,7 @@ export default function HomePage() {
               <div className="flex flex-col gap-1.5 text-xs text-slate-400">
                 <Link href="/login" className="hover:text-amber-400 transition">Portal Sign-In</Link>
                 <Link href="/dashboard" className="hover:text-amber-400 transition">Role Dashboard</Link>
-                <a href={`${apiUrl}/docs`} target="_blank" rel="noreferrer" className="hover:text-amber-400 transition">Swagger API Specs</a>
+                <Link href="/national-materials" className="hover:text-amber-400 transition">National Registry</Link>
               </div>
             </div>
 

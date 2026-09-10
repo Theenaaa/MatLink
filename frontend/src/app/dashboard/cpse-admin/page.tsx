@@ -21,6 +21,10 @@ import {
   ArrowDownToLine,
   Eye,
   FileCheck2,
+  UserPlus,
+  Users,
+  X,
+  Check,
 } from "lucide-react";
 import {
   getDashboardMetrics,
@@ -30,11 +34,15 @@ import {
   listMaterialsApi,
   getMaterialDetailApi,
   batchNormalizeMaterialsApi,
+  listUsersApi,
+  createUserApi,
+  toggleUserStatusApi,
   type DashboardMetrics,
   type UploadValidationResponse,
   type UploadedFileListItem,
   type PaginatedMaterials,
   type MaterialDetailItem,
+  type UserListItem,
 } from "@/lib/api";
 import MaterialDetailModal from "@/components/MaterialDetailModal";
 import MaterialMatchModal from "@/components/MaterialMatchModal";
@@ -99,6 +107,62 @@ export default function CPSEAdminDashboard() {
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   // ── Data Loading ──────────────────────────────────────────────────────────────
+
+  // Team Management state
+  const [teamUsers, setTeamUsers] = useState<UserListItem[]>([]);
+  const [teamLoading, setTeamLoading] = useState(true);
+  const [showTeamModal, setShowTeamModal] = useState(false);
+  const [teamName, setTeamName] = useState("");
+  const [teamEmail, setTeamEmail] = useState("");
+  const [teamPassword, setTeamPassword] = useState("");
+  const [teamRole, setTeamRole] = useState("MATERIAL_EXPERT");
+  const [teamSubmitting, setTeamSubmitting] = useState(false);
+  const [teamFormMsg, setTeamFormMsg] = useState<{ type: "success" | "error"; text: string } | null>(null);
+
+  const loadTeamUsers = useCallback(async () => {
+    if (!token) return;
+    setTeamLoading(true);
+    try {
+      const u = await listUsersApi(token);
+      setTeamUsers(u);
+    } catch { /* silent */ }
+    finally { setTeamLoading(false); }
+  }, [token]);
+
+  const handleCreateTeamMember = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!token) return;
+    setTeamSubmitting(true);
+    setTeamFormMsg(null);
+    try {
+      await createUserApi(token, {
+        name: teamName,
+        email: teamEmail,
+        password: teamPassword,
+        role_name: teamRole,
+      });
+      setTeamFormMsg({ type: "success", text: `Team account created for ${teamEmail}` });
+      setTeamName("");
+      setTeamEmail("");
+      setTeamPassword("");
+      await loadTeamUsers();
+      setTimeout(() => setShowTeamModal(false), 1200);
+    } catch (err: any) {
+      setTeamFormMsg({ type: "error", text: err.message || "Failed to create team member" });
+    } finally {
+      setTeamSubmitting(false);
+    }
+  };
+
+  const handleToggleTeamStatus = async (userItem: UserListItem) => {
+    if (!token) return;
+    try {
+      await toggleUserStatusApi(token, userItem.id, !userItem.is_active);
+      await loadTeamUsers();
+    } catch (err: any) {
+      alert(err.message || "Failed to update status");
+    }
+  };
 
   const loadMetrics = useCallback(async () => {
     if (!token) return;
@@ -271,6 +335,13 @@ export default function CPSEAdminDashboard() {
             </p>
           </div>
           <div className="flex items-center gap-3 shrink-0">
+            <button
+              onClick={() => setShowTeamModal(true)}
+              className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-blue-500/20 hover:bg-blue-500/30 border border-blue-500/40 text-blue-300 text-xs font-semibold transition"
+            >
+              <UserPlus className="w-4 h-4" />
+              <span>Add Team Member</span>
+            </button>
             <div className="px-4 py-2 rounded-xl bg-slate-900/80 border border-slate-800 text-right">
               <span className="text-[10px] text-slate-400 uppercase tracking-wider block">Tenant Isolation</span>
               <span className="text-sm font-bold text-emerald-400 flex items-center justify-end gap-1 font-mono">
@@ -290,7 +361,190 @@ export default function CPSEAdminDashboard() {
         {statCard("Processing Jobs", (metrics?.total_processing_jobs ?? 0).toLocaleString(), "Ingestion pipeline executions", "text-sky-300", Cpu)}
       </div>
 
-      {/* ── Upload Portal ── */}
+      {/* ── Enterprise Team Members Section ── */}
+      <div id="team" className="p-6 rounded-2xl bg-slate-900/50 border border-slate-800 space-y-4">
+        <div className="flex items-center justify-between">
+          <div>
+            <h2 className="text-base font-bold text-white flex items-center gap-2">
+              <Users className="w-4 h-4 text-blue-400" />
+              <span>{cpseCode} Enterprise Team Directory</span>
+            </h2>
+            <p className="text-xs text-slate-400 mt-0.5">
+              Authorized Material Experts and Procurement Analysts for {cpseName}
+            </p>
+          </div>
+          <button
+            onClick={() => setShowTeamModal(true)}
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-blue-500/20 hover:bg-blue-500/30 text-blue-300 border border-blue-500/30 text-xs font-semibold transition"
+          >
+            <UserPlus className="w-3.5 h-3.5" />
+            <span>Add Team Member</span>
+          </button>
+        </div>
+
+        {teamLoading ? (
+          <div className="space-y-2">
+            {[1, 2].map((i) => (
+              <div key={i} className="h-10 bg-slate-800/60 rounded-lg animate-pulse" />
+            ))}
+          </div>
+        ) : teamUsers.length === 0 ? (
+          <div className="text-center py-6 text-slate-500">
+            <Users className="w-8 h-8 mx-auto mb-2 opacity-40" />
+            <p className="text-sm">No team members registered for {cpseCode} yet.</p>
+          </div>
+        ) : (
+          <div className="overflow-x-auto rounded-xl border border-slate-800">
+            <table className="w-full text-left text-xs">
+              <thead>
+                <tr className="bg-slate-900 border-b border-slate-800 text-slate-400 uppercase tracking-wider text-[10px]">
+                  <th className="px-4 py-2.5 font-semibold">User Name</th>
+                  <th className="px-4 py-2.5 font-semibold">Email</th>
+                  <th className="px-4 py-2.5 font-semibold">Role</th>
+                  <th className="px-4 py-2.5 font-semibold">Status</th>
+                  <th className="px-4 py-2.5 font-semibold text-right">Action</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-slate-800/60">
+                {teamUsers.map((u) => (
+                  <tr key={u.id} className="hover:bg-slate-800/30 transition">
+                    <td className="px-4 py-2.5 font-bold text-slate-200">{u.name}</td>
+                    <td className="px-4 py-2.5 font-mono text-slate-300">{u.email}</td>
+                    <td className="px-4 py-2.5 whitespace-nowrap">
+                      <span className="px-2 py-0.5 rounded text-[10px] font-mono font-bold bg-teal-500/10 text-teal-300 border border-teal-500/20">
+                        {u.role?.name || "USER"}
+                      </span>
+                    </td>
+                    <td className="px-4 py-2.5">
+                      <span className={`text-xs font-semibold ${u.is_active ? "text-emerald-400" : "text-red-400"}`}>
+                        {u.is_active ? "Active" : "Deactivated"}
+                      </span>
+                    </td>
+                    <td className="px-4 py-2.5 text-right">
+                      {u.role?.name !== "CPSE_ADMIN" && u.role?.name !== "SUPER_ADMIN" && (
+                        <button
+                          onClick={() => handleToggleTeamStatus(u)}
+                          className="px-2.5 py-1 rounded text-[11px] font-semibold bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700 transition"
+                        >
+                          {u.is_active ? "Deactivate" : "Activate"}
+                        </button>
+                      )}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
+      </div>
+
+      {/* ── CREATE TEAM MEMBER MODAL ── */}
+      {showTeamModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-sm animate-in fade-in duration-200">
+          <div className="w-full max-w-md bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-2xl space-y-4">
+            <div className="flex items-center justify-between border-b border-slate-800 pb-3">
+              <div className="flex items-center gap-2 text-blue-400 font-bold text-base">
+                <UserPlus className="w-5 h-5" />
+                <span>Add {cpseCode} Team Member</span>
+              </div>
+              <button
+                onClick={() => setShowTeamModal(false)}
+                className="text-slate-400 hover:text-white p-1 rounded-lg hover:bg-slate-800 transition"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            <form onSubmit={handleCreateTeamMember} className="space-y-4">
+              <div>
+                <label className="block text-xs font-semibold text-slate-300 mb-1">
+                  Full Name <span className="text-blue-400">*</span>
+                </label>
+                <input
+                  type="text"
+                  required
+                  value={teamName}
+                  onChange={(e) => setTeamName(e.target.value)}
+                  placeholder="e.g. Ananya Sharma"
+                  className="w-full px-3 py-2 rounded-xl bg-slate-950 border border-slate-700 text-xs text-white focus:outline-none focus:border-blue-500 placeholder-slate-600"
+                />
+              </div>
+
+              <div>
+                <label className="block text-xs font-semibold text-slate-300 mb-1">
+                  Email Address <span className="text-blue-400">*</span>
+                </label>
+                <input
+                  type="email"
+                  required
+                  value={teamEmail}
+                  onChange={(e) => setTeamEmail(e.target.value)}
+                  placeholder={`e.g. expert@${cpseCode.toLowerCase()}.co.in`}
+                  className="w-full px-3 py-2 rounded-xl bg-slate-950 border border-slate-700 text-xs text-white focus:outline-none focus:border-blue-500 placeholder-slate-600"
+                />
+              </div>
+
+              <div>
+                <label className="block text-xs font-semibold text-slate-300 mb-1">
+                  Assigned Role <span className="text-blue-400">*</span>
+                </label>
+                <select
+                  value={teamRole}
+                  onChange={(e) => setTeamRole(e.target.value)}
+                  className="w-full px-3 py-2 rounded-xl bg-slate-950 border border-slate-700 text-xs text-white focus:outline-none focus:border-blue-500"
+                >
+                  <option value="MATERIAL_EXPERT">MATERIAL_EXPERT (Cataloguer / Standardization Expert)</option>
+                  <option value="PROCUREMENT_ANALYST">PROCUREMENT_ANALYST (Sourcing Lead)</option>
+                </select>
+              </div>
+
+              <div>
+                <label className="block text-xs font-semibold text-slate-300 mb-1">
+                  Initial Password <span className="text-blue-400">*</span>
+                </label>
+                <input
+                  type="password"
+                  required
+                  value={teamPassword}
+                  onChange={(e) => setTeamPassword(e.target.value)}
+                  placeholder="Minimum 6 characters"
+                  className="w-full px-3 py-2 rounded-xl bg-slate-950 border border-slate-700 text-xs text-white focus:outline-none focus:border-blue-500 placeholder-slate-600"
+                />
+              </div>
+
+              {teamFormMsg && (
+                <div
+                  className={`p-3 rounded-xl text-xs flex items-center gap-2 ${
+                    teamFormMsg.type === "success"
+                      ? "bg-emerald-500/10 border border-emerald-500/30 text-emerald-300"
+                      : "bg-red-500/10 border border-red-500/30 text-red-300"
+                  }`}
+                >
+                  {teamFormMsg.type === "success" ? <Check className="w-4 h-4 shrink-0" /> : <AlertTriangle className="w-4 h-4 shrink-0" />}
+                  <span>{teamFormMsg.text}</span>
+                </div>
+              )}
+
+              <div className="flex items-center justify-end gap-3 pt-2 border-t border-slate-800">
+                <button
+                  type="button"
+                  onClick={() => setShowTeamModal(false)}
+                  className="px-4 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-medium transition"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  disabled={teamSubmitting}
+                  className="px-5 py-2 rounded-xl bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 disabled:opacity-50 text-white text-xs font-bold shadow-md transition"
+                >
+                  {teamSubmitting ? "Creating..." : "Create Team Member"}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
       <div id="ingestion" className="p-6 rounded-2xl bg-slate-900/50 border border-slate-800">
         <div className="flex items-center justify-between mb-4">
           <div>
