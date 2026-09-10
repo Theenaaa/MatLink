@@ -212,3 +212,4 @@ def toggle_user_status(
         .first()
     )
     return UserListItemResponse.model_validate(res)
+

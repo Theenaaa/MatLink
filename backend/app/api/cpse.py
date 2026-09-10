@@ -51,3 +51,4 @@ def create_cpse(
     db.commit()
     db.refresh(cpse)
     return CPSEResponse.model_validate(cpse)
+
