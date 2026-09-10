@@ -138,7 +138,7 @@ export default function NationalMaterialsDirectoryPage() {
           <div>
             <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-emerald-500/20 text-emerald-400 text-[11px] font-semibold mb-2 border border-emerald-500/30">
               <Database className="w-3.5 h-3.5" />
-              <span>National Material Standardization Registry (SIH 26099)</span>
+              <span>National Material Standardization Registry</span>
             </div>
             <h1 className="text-2xl font-black text-white tracking-tight">
               National Material Directory

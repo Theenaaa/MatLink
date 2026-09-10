@@ -27,7 +27,9 @@ import {
   Globe,
   Layers,
   ArrowUpRight,
-  Award
+  Award,
+  Play,
+  X
 } from "lucide-react";
 
 interface HealthStatus {
@@ -53,12 +55,12 @@ const SPOKES = Array.from({ length: 24 }, (_, i) => {
   };
 });
 
-function GovtEmblem({ size = 42 }: { size?: number }) {
+function GovtEmblem({ size = 44 }: { size?: number }) {
   return (
     <div
       aria-label="Government of India Emblem"
       style={{ width: size, height: size }}
-      className="rounded-full border border-amber-500/30 bg-gradient-to-b from-amber-50 to-amber-100 flex items-center justify-center shrink-0 shadow-md overflow-hidden p-0.5"
+      className="rounded-full border border-amber-600/30 bg-gradient-to-b from-amber-50 to-amber-100 flex items-center justify-center shrink-0 shadow-sm overflow-hidden p-0.5"
     >
       <svg width={size * 0.75} height={size * 0.75} viewBox="0 0 40 40" fill="none">
         <circle cx="20" cy="20" r="17" stroke="#854d0e" strokeWidth="1.5" fill="none" />
@@ -85,7 +87,7 @@ function GovtEmblem({ size = 42 }: { size?: number }) {
 // ── CPSE Logos (Custom SVG Components) ────────────────────────────
 function CPCLSvg() {
   return (
-    <svg viewBox="0 0 48 48" className="w-9 h-9" fill="none">
+    <svg viewBox="0 0 48 48" className="w-10 h-10" fill="none">
       <rect width="48" height="48" rx="12" fill="url(#cpcl-grad)" />
       <path d="M14 34L24 12L34 34H14Z" stroke="white" strokeWidth="2.5" strokeLinejoin="round" />
       <circle cx="24" cy="25" r="4" fill="#fbbf24" />
@@ -102,7 +104,7 @@ function CPCLSvg() {
 
 function IOCLSvg() {
   return (
-    <svg viewBox="0 0 48 48" className="w-9 h-9" fill="none">
+    <svg viewBox="0 0 48 48" className="w-10 h-10" fill="none">
       <rect width="48" height="48" rx="12" fill="url(#iocl-grad)" />
       <circle cx="24" cy="24" r="14" stroke="white" strokeWidth="2.5" />
       <path d="M24 14C24 14 18 22 18 26C18 29.3137 20.6863 32 24 32C27.3137 32 30 29.3137 30 26C30 22 24 14 24 14Z" fill="#ffedd5" stroke="#ea580c" strokeWidth="1.5" />
@@ -118,7 +120,7 @@ function IOCLSvg() {
 
 function ONGCSvg() {
   return (
-    <svg viewBox="0 0 48 48" className="w-9 h-9" fill="none">
+    <svg viewBox="0 0 48 48" className="w-10 h-10" fill="none">
       <rect width="48" height="48" rx="12" fill="url(#ongc-grad)" />
       <path d="M24 10V38M14 24H34M17 17L31 31M31 17L17 31" stroke="white" strokeWidth="2.5" strokeLinecap="round" />
       <circle cx="24" cy="24" r="6" fill="#fecdd3" />
@@ -134,7 +136,7 @@ function ONGCSvg() {
 
 function GAILSvg() {
   return (
-    <svg viewBox="0 0 48 48" className="w-9 h-9" fill="none">
+    <svg viewBox="0 0 48 48" className="w-10 h-10" fill="none">
       <rect width="48" height="48" rx="12" fill="url(#gail-grad)" />
       <path d="M12 30C18 20 30 20 36 30" stroke="white" strokeWidth="3" strokeLinecap="round" />
       <path d="M14 22C20 14 28 14 34 22" stroke="#a7f3d0" strokeWidth="2" strokeLinecap="round" />
@@ -151,7 +153,7 @@ function GAILSvg() {
 
 function BPCLSvg() {
   return (
-    <svg viewBox="0 0 48 48" className="w-9 h-9" fill="none">
+    <svg viewBox="0 0 48 48" className="w-10 h-10" fill="none">
       <rect width="48" height="48" rx="12" fill="url(#bpcl-grad)" />
       <circle cx="24" cy="24" r="13" stroke="#fef08a" strokeWidth="2.5" />
       <path d="M24 16L27 22H21L24 16Z" fill="#fef08a" />
@@ -169,7 +171,7 @@ function BPCLSvg() {
 
 function HPCLSvg() {
   return (
-    <svg viewBox="0 0 48 48" className="w-9 h-9" fill="none">
+    <svg viewBox="0 0 48 48" className="w-10 h-10" fill="none">
       <rect width="48" height="48" rx="12" fill="url(#hpcl-grad)" />
       <path d="M16 14V34M32 14V34M16 24H32" stroke="white" strokeWidth="3" strokeLinecap="round" />
       <circle cx="24" cy="24" r="4" fill="#e0e7ff" />
@@ -186,7 +188,6 @@ function HPCLSvg() {
 export default function HomePage() {
   const [health, setHealth] = useState<HealthStatus | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
-  const [error, setError] = useState<string | null>(null);
   const [loginDropdownOpen, setLoginDropdownOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const dropdownRef = useRef<HTMLDivElement>(null);
@@ -201,9 +202,8 @@ export default function HomePage() {
         if (!res.ok) throw new Error(`API status ${res.status}`);
         const data = await res.json();
         setHealth(data);
-        setError(null);
       } catch (err: any) {
-        setError(err.message || "Failed to connect to CANONIX Backend API");
+        // Fallback status gracefully
       } finally {
         setLoading(false);
       }
@@ -230,10 +230,8 @@ export default function HomePage() {
       location: "Chennai, Tamil Nadu",
       items: "45,000+",
       normRate: "98.4%",
-      bgGlow: "from-amber-500/10 via-amber-500/5 to-transparent",
-      borderColor: "hover:border-amber-500/50 hover:shadow-amber-500/10",
-      accentColor: "text-amber-400 bg-amber-500/10 border-amber-500/20",
-      btnColor: "bg-gradient-to-r from-amber-500 to-orange-600 hover:from-amber-400 hover:to-orange-500 text-white",
+      accentColor: "text-amber-700 bg-amber-50 border-amber-200",
+      btnColor: "bg-gradient-to-r from-amber-500 to-orange-600 hover:from-amber-600 hover:to-orange-700 text-white shadow-md shadow-amber-500/20",
       logo: <CPCLSvg />,
       loginEmail: "admin@cpcl.co.in",
       roleBadge: "CPSE Admin (CPCL)",
@@ -246,10 +244,8 @@ export default function HomePage() {
       location: "New Delhi / Multi-Plant",
       items: "120,000+",
       normRate: "96.2%",
-      bgGlow: "from-orange-500/10 via-orange-500/5 to-transparent",
-      borderColor: "hover:border-orange-500/50 hover:shadow-orange-500/10",
-      accentColor: "text-orange-400 bg-orange-500/10 border-orange-500/20",
-      btnColor: "bg-gradient-to-r from-orange-500 to-amber-600 hover:from-orange-400 hover:to-amber-500 text-white",
+      accentColor: "text-orange-700 bg-orange-50 border-orange-200",
+      btnColor: "bg-gradient-to-r from-orange-500 to-amber-600 hover:from-orange-600 hover:to-amber-700 text-white shadow-md shadow-orange-500/20",
       logo: <IOCLSvg />,
       loginEmail: "admin@iocl.co.in",
       roleBadge: "CPSE Admin (IOCL)",
@@ -262,10 +258,8 @@ export default function HomePage() {
       location: "Dehradun, Uttarakhand",
       items: "85,000+",
       normRate: "95.8%",
-      bgGlow: "from-rose-500/10 via-rose-500/5 to-transparent",
-      borderColor: "hover:border-rose-500/50 hover:shadow-rose-500/10",
-      accentColor: "text-rose-400 bg-rose-500/10 border-rose-500/20",
-      btnColor: "bg-gradient-to-r from-rose-600 to-red-700 hover:from-rose-500 hover:to-red-600 text-white",
+      accentColor: "text-rose-700 bg-rose-50 border-rose-200",
+      btnColor: "bg-gradient-to-r from-rose-600 to-red-700 hover:from-rose-700 hover:to-red-800 text-white shadow-md shadow-rose-500/20",
       logo: <ONGCSvg />,
       loginEmail: "superadmin@canonix.gov.in",
       roleBadge: "Super Admin (MoPNG)",
@@ -278,10 +272,8 @@ export default function HomePage() {
       location: "New Delhi",
       items: "38,000+",
       normRate: "97.1%",
-      bgGlow: "from-emerald-500/10 via-emerald-500/5 to-transparent",
-      borderColor: "hover:border-emerald-500/50 hover:shadow-emerald-500/10",
-      accentColor: "text-emerald-400 bg-emerald-500/10 border-emerald-500/20",
-      btnColor: "bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white",
+      accentColor: "text-emerald-700 bg-emerald-50 border-emerald-200",
+      btnColor: "bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 text-white shadow-md shadow-emerald-500/20",
       logo: <GAILSvg />,
       loginEmail: "analyst@cpcl.co.in",
       roleBadge: "Procurement Analyst",
@@ -294,10 +286,8 @@ export default function HomePage() {
       location: "Mumbai, Maharashtra",
       items: "62,000+",
       normRate: "94.9%",
-      bgGlow: "from-sky-500/10 via-sky-500/5 to-transparent",
-      borderColor: "hover:border-sky-500/50 hover:shadow-sky-500/10",
-      accentColor: "text-sky-400 bg-sky-500/10 border-sky-500/20",
-      btnColor: "bg-gradient-to-r from-sky-600 to-blue-700 hover:from-sky-500 hover:to-blue-600 text-white",
+      accentColor: "text-sky-700 bg-sky-50 border-sky-200",
+      btnColor: "bg-gradient-to-r from-sky-600 to-blue-700 hover:from-sky-700 hover:to-blue-800 text-white shadow-md shadow-sky-500/20",
       logo: <BPCLSvg />,
       loginEmail: "expert@cpcl.co.in",
       roleBadge: "Material Expert",
@@ -310,10 +300,8 @@ export default function HomePage() {
       location: "Mumbai, Maharashtra",
       items: "54,000+",
       normRate: "95.4%",
-      bgGlow: "from-indigo-500/10 via-indigo-500/5 to-transparent",
-      borderColor: "hover:border-indigo-500/50 hover:shadow-indigo-500/10",
-      accentColor: "text-indigo-400 bg-indigo-500/10 border-indigo-500/20",
-      btnColor: "bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 text-white",
+      accentColor: "text-indigo-700 bg-indigo-50 border-indigo-200",
+      btnColor: "bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white shadow-md shadow-indigo-500/20",
       logo: <HPCLSvg />,
       loginEmail: "admin@cpcl.co.in",
       roleBadge: "Enterprise Workstation",
@@ -355,27 +343,27 @@ export default function HomePage() {
   ];
 
   return (
-    <div className="flex flex-col min-h-screen bg-slate-950 text-slate-100 font-sans selection:bg-sky-500 selection:text-white">
+    <div className="flex flex-col min-h-screen bg-slate-50 text-slate-900 font-sans selection:bg-sky-500 selection:text-white">
       
       {/* ── Top Government Tricolor Accent Strip ── */}
-      <div className="h-1.5 w-full bg-gradient-to-r from-orange-500 via-white to-emerald-500 z-50 sticky top-0" />
+      <div className="h-1.5 w-full bg-gradient-to-r from-[#ff9933] via-white to-[#138808] z-50 sticky top-0 shadow-sm" />
 
-      {/* ── Main Government Navigation Header ── */}
-      <header className="border-b border-slate-800 bg-slate-950/90 backdrop-blur-md sticky top-1.5 z-40">
+      {/* ── Main Government & Enterprise Header ── */}
+      <header className="border-b border-slate-200 bg-white/95 backdrop-blur-md sticky top-1.5 z-40 shadow-sm">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3 flex items-center justify-between">
           
           {/* Left Brand Identification */}
           <div className="flex items-center gap-3.5">
             <GovtEmblem size={44} />
-            <div className="border-l border-slate-800 pl-3.5">
+            <div className="border-l border-slate-200 pl-3.5">
               <div className="flex items-center gap-2">
-                <span className="font-extrabold text-xl tracking-tight text-white">CANONIX</span>
-                <span className="text-[10px] px-2 py-0.5 rounded-full bg-sky-500/10 border border-sky-500/30 text-sky-400 font-bold uppercase tracking-wider">
-                  SIH 26099
+                <span className="font-extrabold text-xl tracking-tight text-slate-900">CANONIX</span>
+                <span className="text-[10px] px-2.5 py-0.5 rounded-full bg-sky-50 border border-sky-200 text-sky-700 font-bold uppercase tracking-wider">
+                  Enterprise Platform
                 </span>
               </div>
-              <p className="text-xs text-slate-400 font-medium">
-                Ministry of Petroleum & Natural Gas | CPCL Technical Cell
+              <p className="text-xs text-slate-500 font-medium">
+                Government of India · Ministry of Petroleum & Natural Gas
               </p>
             </div>
           </div>
@@ -383,23 +371,23 @@ export default function HomePage() {
           {/* Right Controls & Login Action */}
           <div className="flex items-center gap-4">
             
-            {/* Backend Live Connectivity Badge */}
-            <div className="hidden md:flex items-center gap-2 px-3 py-1.5 rounded-full bg-slate-900 border border-slate-800 text-xs">
-              <span className="text-slate-400 font-medium">Backend API:</span>
+            {/* Backend Connectivity Badge */}
+            <div className="hidden md:flex items-center gap-2 px-3 py-1.5 rounded-full bg-slate-100 border border-slate-200 text-xs">
+              <span className="text-slate-500 font-medium">System Status:</span>
               {loading ? (
-                <span className="flex items-center gap-1.5 text-amber-400 font-medium">
+                <span className="flex items-center gap-1.5 text-amber-600 font-medium">
                   <Activity className="w-3.5 h-3.5 animate-spin" />
                   Connecting...
                 </span>
               ) : health ? (
-                <span className="flex items-center gap-1.5 text-emerald-400 font-semibold">
-                  <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+                <span className="flex items-center gap-1.5 text-emerald-600 font-semibold">
+                  <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
                   Online (v{health.version})
                 </span>
               ) : (
-                <span className="flex items-center gap-1.5 text-rose-400 font-semibold">
+                <span className="flex items-center gap-1.5 text-rose-600 font-semibold">
                   <AlertCircle className="w-3.5 h-3.5" />
-                  Offline ({apiUrl})
+                  Offline
                 </span>
               )}
             </div>
@@ -408,61 +396,61 @@ export default function HomePage() {
             <div className="relative" ref={dropdownRef}>
               <button
                 onClick={() => setLoginDropdownOpen(!loginDropdownOpen)}
-                className="flex items-center gap-2 px-4 py-2 rounded-lg bg-gradient-to-r from-orange-500 to-amber-600 hover:from-orange-400 hover:to-amber-500 text-white font-semibold text-xs transition-all shadow-lg shadow-orange-500/20"
+                className="flex items-center gap-2 px-4 py-2 rounded-xl bg-gradient-to-r from-amber-500 to-orange-600 hover:from-amber-600 hover:to-orange-700 text-white font-semibold text-xs transition-all shadow-md shadow-orange-500/20 active:scale-95"
               >
-                <span>Sign In to Role Workstation</span>
+                <span>Sign In to Workstation</span>
                 <ChevronDown className={`w-3.5 h-3.5 transition-transform duration-200 ${loginDropdownOpen ? "rotate-180" : ""}`} />
               </button>
 
               {loginDropdownOpen && (
-                <div className="absolute right-0 mt-2 w-72 bg-slate-900 border border-slate-700 rounded-xl shadow-2xl overflow-hidden z-50 animate-in fade-in zoom-in-95 duration-150">
-                  <div className="p-3 bg-slate-850 border-b border-slate-800">
-                    <p className="text-[11px] font-bold text-slate-300 uppercase tracking-wider">Select Role Workstation</p>
+                <div className="absolute right-0 mt-2 w-72 bg-white border border-slate-200 rounded-2xl shadow-2xl overflow-hidden z-50 animate-in fade-in zoom-in-95 duration-150">
+                  <div className="p-3.5 bg-slate-50 border-b border-slate-200">
+                    <p className="text-[11px] font-bold text-slate-700 uppercase tracking-wider">Select Role Workstation</p>
                   </div>
                   <div className="p-2 space-y-1">
                     <Link
                       href="/login?email=admin@cpcl.co.in"
-                      className="flex items-center gap-2.5 p-2 rounded-lg hover:bg-slate-800 transition text-xs text-slate-200"
+                      className="flex items-center gap-2.5 p-2.5 rounded-xl hover:bg-slate-100 transition text-xs text-slate-700"
                     >
-                      <Building2 className="w-4 h-4 text-amber-400 shrink-0" />
+                      <Building2 className="w-4 h-4 text-amber-600 shrink-0" />
                       <div>
-                        <div className="font-semibold text-white">CPSE Admin (CPCL)</div>
-                        <div className="text-[10px] text-slate-400">Ingestion, Users & Catalog Operations</div>
+                        <div className="font-semibold text-slate-900">CPSE Admin (CPCL)</div>
+                        <div className="text-[10px] text-slate-500">Ingestion, Users & Catalog Operations</div>
                       </div>
                     </Link>
                     <Link
                       href="/login?email=superadmin@canonix.gov.in"
-                      className="flex items-center gap-2.5 p-2 rounded-lg hover:bg-slate-800 transition text-xs text-slate-200"
+                      className="flex items-center gap-2.5 p-2.5 rounded-xl hover:bg-slate-100 transition text-xs text-slate-700"
                     >
-                      <ShieldCheck className="w-4 h-4 text-purple-400 shrink-0" />
+                      <ShieldCheck className="w-4 h-4 text-purple-600 shrink-0" />
                       <div>
-                        <div className="font-semibold text-white">Super Admin (MoPNG)</div>
-                        <div className="text-[10px] text-slate-400">Universal Cross-CPSE View</div>
+                        <div className="font-semibold text-slate-900">Super Admin (MoPNG)</div>
+                        <div className="text-[10px] text-slate-500">Universal Cross-CPSE Master View</div>
                       </div>
                     </Link>
                     <Link
                       href="/login?email=expert@cpcl.co.in"
-                      className="flex items-center gap-2.5 p-2 rounded-lg hover:bg-slate-800 transition text-xs text-slate-200"
+                      className="flex items-center gap-2.5 p-2.5 rounded-xl hover:bg-slate-100 transition text-xs text-slate-700"
                     >
-                      <UserCheck className="w-4 h-4 text-emerald-400 shrink-0" />
+                      <UserCheck className="w-4 h-4 text-emerald-600 shrink-0" />
                       <div>
-                        <div className="font-semibold text-white">Material Expert</div>
-                        <div className="text-[10px] text-slate-400">DNA Review & Match Approvals</div>
+                        <div className="font-semibold text-slate-900">Material Expert</div>
+                        <div className="text-[10px] text-slate-500">DNA Review & Match Approvals</div>
                       </div>
                     </Link>
                     <Link
                       href="/login?email=analyst@cpcl.co.in"
-                      className="flex items-center gap-2.5 p-2 rounded-lg hover:bg-slate-800 transition text-xs text-slate-200"
+                      className="flex items-center gap-2.5 p-2.5 rounded-xl hover:bg-slate-100 transition text-xs text-slate-700"
                     >
-                      <BarChart3 className="w-4 h-4 text-sky-400 shrink-0" />
+                      <BarChart3 className="w-4 h-4 text-sky-600 shrink-0" />
                       <div>
-                        <div className="font-semibold text-white">Procurement Analyst</div>
-                        <div className="text-[10px] text-slate-400">Spend Analytics & Demand Aggregation</div>
+                        <div className="font-semibold text-slate-900">Procurement Analyst</div>
+                        <div className="text-[10px] text-slate-500">Spend Analytics & Demand Aggregation</div>
                       </div>
                     </Link>
                   </div>
-                  <div className="p-2 border-t border-slate-800 bg-slate-950 text-center">
-                    <Link href="/login" className="text-[11px] font-medium text-amber-400 hover:underline">
+                  <div className="p-2.5 border-t border-slate-200 bg-slate-50 text-center">
+                    <Link href="/login" className="text-[11px] font-semibold text-orange-600 hover:underline">
                       Standard Sign-In Page →
                     </Link>
                   </div>
@@ -474,42 +462,42 @@ export default function HomePage() {
         </div>
       </header>
 
-      {/* ── Hero Section ── */}
-      <section className="relative overflow-hidden pt-12 pb-16 border-b border-slate-800/80 bg-gradient-to-b from-slate-950 via-slate-900 to-slate-950">
+      {/* ── Hero Section (Deep Navy Gradient from Main Branch) ── */}
+      <section className="relative overflow-hidden pt-14 pb-20 bg-gradient-to-br from-slate-900 via-indigo-950 to-slate-900 text-white shadow-xl">
         
-        {/* Ambient Glows */}
-        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full max-w-7xl h-96 bg-gradient-to-r from-sky-500/10 via-amber-500/10 to-emerald-500/10 blur-3xl pointer-events-none" />
+        {/* Animated Glow Accents */}
+        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full max-w-7xl h-96 bg-gradient-to-r from-sky-500/20 via-amber-500/20 to-emerald-500/20 blur-3xl pointer-events-none" />
 
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
           
           <div className="max-w-3xl">
             
-            <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-slate-900 border border-slate-800 text-amber-400 text-xs font-semibold mb-6 shadow-sm">
-              <Award className="w-4 h-4 text-amber-400" />
-              <span>MoPNG Enterprise Platform | Smart India Hackathon 2026</span>
+            <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-white/10 border border-white/20 text-amber-300 text-xs font-semibold mb-6 shadow-sm backdrop-blur-md">
+              <Award className="w-4 h-4 text-amber-300" />
+              <span>Government of India · National Automation Initiative</span>
             </div>
 
-            <h1 className="text-4xl sm:text-5xl lg:text-6xl font-black text-white tracking-tight leading-[1.1] mb-6">
-              National Material Master <span className="bg-gradient-to-r from-orange-400 via-amber-300 to-emerald-400 bg-clip-text text-transparent">Identity & Harmonization</span> Engine
+            <h1 className="text-4xl sm:text-5xl lg:text-6xl font-black tracking-tight leading-[1.1] mb-6">
+              National Material Master <span className="bg-gradient-to-r from-amber-300 via-orange-400 to-emerald-400 bg-clip-text text-transparent">Identity & Harmonization</span> Engine
             </h1>
 
             <p className="text-slate-300 text-base sm:text-lg leading-relaxed mb-8">
-              Standardizing, classifying, and unifying material master catalogues across CPCL, IOCL, ONGC, GAIL, BPCL, and HPCL into canonical Material DNA with explainable hybrid AI matching and zero legacy data loss.
+              Standardizing, classifying, and unifying material master catalogues across CPCL, IOCL, ONGC, GAIL, BPCL, and HPCL into canonical Material DNA with explainable AI matching and complete legacy code preservation.
             </p>
 
             {/* CTA Buttons */}
             <div className="flex flex-wrap items-center gap-4">
               <Link 
                 href="/login"
-                className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-gradient-to-r from-orange-500 to-amber-600 hover:from-orange-400 hover:to-amber-500 text-white font-bold text-sm transition-all shadow-xl shadow-orange-500/25 group"
+                className="inline-flex items-center gap-2 px-6 py-3.5 rounded-xl bg-gradient-to-r from-amber-500 to-orange-600 hover:from-amber-400 hover:to-orange-500 text-white font-bold text-sm transition-all shadow-xl shadow-orange-500/25 group transform hover:-translate-y-0.5"
               >
-                <span>Enter Role Workstation</span>
+                <span>Enter Workstation</span>
                 <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
               </Link>
 
               <Link 
                 href="/dashboard"
-                className="inline-flex items-center gap-2 px-5 py-3 rounded-xl bg-slate-900 hover:bg-slate-850 border border-slate-750 text-slate-200 font-semibold text-sm transition-all hover:border-slate-600"
+                className="inline-flex items-center gap-2 px-5 py-3.5 rounded-xl bg-white/10 hover:bg-white/20 border border-white/20 text-white font-semibold text-sm transition-all backdrop-blur-md"
               >
                 <Boxes className="w-4 h-4 text-sky-400" />
                 <span>Role Dashboard</span>
@@ -519,33 +507,33 @@ export default function HomePage() {
                 href={`${apiUrl}/docs`}
                 target="_blank"
                 rel="noreferrer"
-                className="inline-flex items-center gap-2 px-5 py-3 rounded-xl bg-slate-900 hover:bg-slate-850 border border-slate-750 text-slate-200 font-semibold text-sm transition-all hover:border-slate-600"
+                className="inline-flex items-center gap-2 px-5 py-3.5 rounded-xl bg-white/10 hover:bg-white/20 border border-white/20 text-white font-semibold text-sm transition-all backdrop-blur-md"
               >
                 <Cpu className="w-4 h-4 text-emerald-400" />
-                <span>FastAPI Swagger Docs</span>
-                <ArrowUpRight className="w-3.5 h-3.5 text-slate-400" />
+                <span>API Portal</span>
+                <ArrowUpRight className="w-3.5 h-3.5 text-slate-300" />
               </a>
             </div>
 
           </div>
 
           {/* Key Metrics Counter Row */}
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mt-14 pt-8 border-t border-slate-800/80">
-            <div className="p-4 rounded-xl bg-slate-900/60 border border-slate-800">
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mt-16 pt-8 border-t border-white/10">
+            <div className="p-4 rounded-2xl bg-white/5 border border-white/10 backdrop-blur-md">
               <div className="text-2xl sm:text-3xl font-black text-white tracking-tight">45,000+</div>
-              <div className="text-xs text-slate-400 mt-1 font-medium">Standardized Line Items</div>
+              <div className="text-xs text-slate-300 mt-1 font-medium">Standardized Line Items</div>
             </div>
-            <div className="p-4 rounded-xl bg-slate-900/60 border border-slate-800">
-              <div className="text-2xl sm:text-3xl font-black text-amber-400 tracking-tight">6 Primary</div>
-              <div className="text-xs text-slate-400 mt-1 font-medium">Integrated CPSEs</div>
+            <div className="p-4 rounded-2xl bg-white/5 border border-white/10 backdrop-blur-md">
+              <div className="text-2xl sm:text-3xl font-black text-amber-300 tracking-tight">6 Primary</div>
+              <div className="text-xs text-slate-300 mt-1 font-medium">Integrated CPSEs</div>
             </div>
-            <div className="p-4 rounded-xl bg-slate-900/60 border border-slate-800">
-              <div className="text-2xl sm:text-3xl font-black text-emerald-400 tracking-tight">94.8%</div>
-              <div className="text-xs text-slate-400 mt-1 font-medium">Match Precision Consensus</div>
+            <div className="p-4 rounded-2xl bg-white/5 border border-white/10 backdrop-blur-md">
+              <div className="text-2xl sm:text-3xl font-black text-emerald-300 tracking-tight">94.8%</div>
+              <div className="text-xs text-slate-300 mt-1 font-medium">Match Precision Consensus</div>
             </div>
-            <div className="p-4 rounded-xl bg-slate-900/60 border border-slate-800">
-              <div className="text-2xl sm:text-3xl font-black text-sky-400 tracking-tight">9-Stage</div>
-              <div className="text-xs text-slate-400 mt-1 font-medium">AI Pipeline Architecture</div>
+            <div className="p-4 rounded-2xl bg-white/5 border border-white/10 backdrop-blur-md">
+              <div className="text-2xl sm:text-3xl font-black text-sky-300 tracking-tight">9-Stage</div>
+              <div className="text-xs text-slate-300 mt-1 font-medium">AI Pipeline Architecture</div>
             </div>
           </div>
 
@@ -553,76 +541,73 @@ export default function HomePage() {
       </section>
 
       {/* ── CPSE Enterprise Directory & Access Cards ── */}
-      <section className="py-16 bg-slate-950 border-b border-slate-800/80 relative">
+      <section className="py-16 bg-slate-50 border-b border-slate-200">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           
           <div className="flex flex-col md:flex-row md:items-end justify-between mb-10">
             <div>
-              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-slate-900 border border-slate-800 text-sky-400 text-xs font-semibold mb-3">
+              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-50 border border-blue-200 text-blue-700 text-xs font-semibold mb-3">
                 <Building2 className="w-3.5 h-3.5" /> Participating Public Sector Enterprises
               </div>
-              <h2 className="text-2xl sm:text-3xl font-extrabold text-white tracking-tight">
+              <h2 className="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight">
                 CPSE Enterprise Workstation Cards
               </h2>
-              <p className="text-slate-400 text-sm mt-1 max-w-2xl">
+              <p className="text-slate-600 text-sm mt-1 max-w-2xl">
                 Explore participating CPSE master catalogs or access enterprise workstations for Super Admin, CPSE Admin, Material Experts, and Analysts.
               </p>
             </div>
-            <div className="mt-4 md:mt-0 text-xs text-slate-400 font-mono">
-              Deterministic Multi-Tenant Isolation Active (<span className="text-sky-400">cpse_id</span>)
+            <div className="mt-4 md:mt-0 text-xs text-slate-500 font-mono">
+              Enterprise Data Security Active (<span className="text-blue-600">cpse_id</span>)
             </div>
           </div>
 
-          {/* Interactive CPSE Cards Grid */}
+          {/* Interactive CPSE Cards Grid (Light Mode with Smooth Animations) */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {cpseList.map((cpse) => (
               <div
                 key={cpse.code}
-                className={`group relative rounded-2xl border border-slate-800 bg-slate-900/70 p-6 transition-all duration-300 ${cpse.borderColor} hover:-translate-y-1.5 hover:shadow-2xl overflow-hidden flex flex-col justify-between`}
+                className="group relative rounded-2xl border border-slate-200 bg-white p-6 transition-all duration-300 hover:shadow-2xl hover:border-blue-400 hover:-translate-y-1.5 flex flex-col justify-between"
               >
-                {/* Background Ambient Glow on Hover */}
-                <div className={`absolute top-0 right-0 w-48 h-48 bg-gradient-to-bl ${cpse.bgGlow} rounded-full blur-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none`} />
-
                 <div>
                   {/* Top Logo & Code Header */}
                   <div className="flex items-start justify-between gap-4 mb-4">
                     <div className="flex items-center gap-3">
-                      <div className="p-1.5 rounded-xl bg-slate-950 border border-slate-800 group-hover:scale-105 transition-transform duration-300 shadow-sm">
+                      <div className="p-1 rounded-xl bg-slate-50 border border-slate-200 group-hover:scale-105 transition-transform duration-300 shadow-sm">
                         {cpse.logo}
                       </div>
                       <div>
                         <div className="flex items-center gap-2">
-                          <span className="font-extrabold text-lg text-white">{cpse.code}</span>
+                          <span className="font-extrabold text-lg text-slate-900">{cpse.code}</span>
                           <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full border ${cpse.accentColor}`}>
                             {cpse.items}
                           </span>
                         </div>
-                        <p className="text-xs text-slate-400">{cpse.location}</p>
+                        <p className="text-xs text-slate-500">{cpse.location}</p>
                       </div>
                     </div>
                   </div>
 
                   {/* CPSE Name & Role */}
-                  <h3 className="text-base font-bold text-slate-100 mb-1 group-hover:text-white transition-colors">
+                  <h3 className="text-base font-bold text-slate-900 mb-1 group-hover:text-blue-700 transition-colors">
                     {cpse.name}
                   </h3>
-                  <p className="text-xs font-medium text-slate-400 mb-3">{cpse.role}</p>
+                  <p className="text-xs font-medium text-slate-500 mb-3">{cpse.role}</p>
                   
-                  <p className="text-xs text-slate-300 leading-relaxed mb-4 bg-slate-950/60 p-3 rounded-xl border border-slate-850">
+                  <p className="text-xs text-slate-600 leading-relaxed mb-4 bg-slate-50 p-3 rounded-xl border border-slate-200">
                     {cpse.roleDesc}
                   </p>
                 </div>
 
                 {/* Bottom Role Action Link */}
-                <div className="pt-4 border-t border-slate-800/80">
-                  <div className="flex items-center justify-between mb-3 text-[11px] text-slate-400 font-mono">
+                <div className="pt-4 border-t border-slate-100">
+                  <div className="flex items-center justify-between mb-3 text-[11px] text-slate-500 font-mono">
                     <span>Harmonization Rate:</span>
-                    <span className="text-emerald-400 font-bold">{cpse.normRate}</span>
+                    <span className="text-emerald-600 font-bold">{cpse.normRate}</span>
                   </div>
 
                   <Link
                     href={`/login?email=${cpse.loginEmail}`}
-                    className={`w-full inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl text-xs font-bold transition-all shadow-md ${cpse.btnColor}`}
+                    className={`w-full inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl text-xs font-bold transition-all ${cpse.btnColor}`}
                   >
                     <span>Launch {cpse.roleBadge}</span>
                     <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform" />
@@ -637,22 +622,22 @@ export default function HomePage() {
       </section>
 
       {/* ── 9-Stage AI Pipeline Architecture Section ── */}
-      <section className="py-16 bg-slate-900/40 border-b border-slate-800/80">
+      <section className="py-16 bg-white border-b border-slate-200">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           
           <div className="flex flex-col md:flex-row md:items-end justify-between mb-10">
             <div>
-              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-slate-900 border border-slate-800 text-emerald-400 text-xs font-semibold mb-3">
+              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-50 border border-emerald-200 text-emerald-700 text-xs font-semibold mb-3">
                 <GitMerge className="w-3.5 h-3.5" /> End-to-End Workflow Architecture
               </div>
-              <h2 className="text-2xl sm:text-3xl font-extrabold text-white tracking-tight">
+              <h2 className="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight">
                 9-Stage AI Pipeline & Three-Tier Data Model
               </h2>
-              <p className="text-slate-400 text-sm mt-1 max-w-2xl">
+              <p className="text-slate-600 text-sm mt-1 max-w-2xl">
                 Standardized progression from heterogeneous CPSE ERP inventories to unified National Identity without losing legacy records.
               </p>
             </div>
-            <span className="hidden sm:inline-block px-3.5 py-1.5 rounded-full bg-slate-900 border border-slate-800 text-slate-300 text-xs font-mono">
+            <span className="hidden sm:inline-block px-3.5 py-1.5 rounded-full bg-slate-100 border border-slate-200 text-slate-700 text-xs font-mono">
               Raw → Normalized → Canonical DNA
             </span>
           </div>
@@ -661,16 +646,16 @@ export default function HomePage() {
             {pipelineStages.map((stage, idx) => (
               <div 
                 key={stage.name}
-                className="flex items-start gap-3.5 p-4 rounded-xl bg-slate-900/70 border border-slate-800 hover:border-slate-700 transition-all hover:bg-slate-900"
+                className="flex items-start gap-3.5 p-4 rounded-xl bg-slate-50 border border-slate-200 hover:border-blue-300 hover:shadow-md transition-all"
               >
-                <div className="w-8 h-8 rounded-lg bg-sky-500/10 border border-sky-500/20 flex items-center justify-center text-xs font-black text-sky-400 shrink-0">
+                <div className="w-8 h-8 rounded-lg bg-blue-100 border border-blue-200 flex items-center justify-center text-xs font-black text-blue-700 shrink-0">
                   {idx + 1}
                 </div>
                 <div>
-                  <div className="text-sm font-bold text-slate-100 tracking-wide">
+                  <div className="text-sm font-bold text-slate-900 tracking-wide">
                     {stage.name}
                   </div>
-                  <div className="text-xs text-slate-400 mt-1 leading-relaxed">
+                  <div className="text-xs text-slate-600 mt-1 leading-relaxed">
                     {stage.desc}
                   </div>
                 </div>
@@ -682,34 +667,34 @@ export default function HomePage() {
       </section>
 
       {/* ── System Core Modules & Gazette Bulletins ── */}
-      <section className="py-16 bg-slate-950 border-b border-slate-800/80">
+      <section className="py-16 bg-slate-50 border-b border-slate-200">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
             
             {/* Left 2 Cols: News Circulars & Gazette Notifications */}
             <div className="lg:col-span-2 space-y-6">
-              <div className="flex items-center justify-between border-b border-slate-800 pb-4">
+              <div className="flex items-center justify-between border-b border-slate-200 pb-4">
                 <div>
-                  <h3 className="text-xl font-bold text-white tracking-tight">Gazette Notifications & Technical Circulars</h3>
-                  <p className="text-xs text-slate-400 mt-0.5">Ministry directives & CPCL Technical Cell publications</p>
+                  <h3 className="text-xl font-bold text-slate-900 tracking-tight">Gazette Notifications & Technical Circulars</h3>
+                  <p className="text-xs text-slate-500 mt-0.5">Ministry directives & Technical Cell publications</p>
                 </div>
-                <BookOpen className="w-5 h-5 text-amber-400" />
+                <BookOpen className="w-5 h-5 text-amber-600" />
               </div>
 
               <div className="space-y-4">
                 {newsItems.map((item, idx) => (
-                  <div key={idx} className="p-5 rounded-2xl bg-slate-900/60 border border-slate-800 hover:border-slate-750 transition">
+                  <div key={idx} className="p-5 rounded-2xl bg-white border border-slate-200 hover:border-slate-300 hover:shadow-md transition">
                     <div className="flex items-center gap-3 text-xs mb-2">
-                      <span className="px-2.5 py-0.5 rounded-full bg-amber-500/10 border border-amber-500/30 text-amber-400 font-semibold">
+                      <span className="px-2.5 py-0.5 rounded-full bg-amber-50 border border-amber-200 text-amber-700 font-semibold">
                         {item.tag}
                       </span>
-                      <span className="text-slate-500">{item.date}</span>
+                      <span className="text-slate-400">{item.date}</span>
                     </div>
-                    <h4 className="text-base font-bold text-white mb-1.5 hover:text-sky-300 transition cursor-pointer">
+                    <h4 className="text-base font-bold text-slate-900 mb-1.5 hover:text-blue-600 transition cursor-pointer">
                       {item.title}
                     </h4>
-                    <p className="text-xs text-slate-400 leading-relaxed">
+                    <p className="text-xs text-slate-600 leading-relaxed">
                       {item.desc}
                     </p>
                   </div>
@@ -719,14 +704,14 @@ export default function HomePage() {
 
             {/* Right Col: How Do I Quick Inquiry & Specs */}
             <div className="space-y-6">
-              <div className="flex items-center justify-between border-b border-slate-800 pb-4">
-                <h3 className="text-xl font-bold text-white tracking-tight">Quick Catalog Search</h3>
-                <Search className="w-5 h-5 text-sky-400" />
+              <div className="flex items-center justify-between border-b border-slate-200 pb-4">
+                <h3 className="text-xl font-bold text-slate-900 tracking-tight">Quick Catalog Search</h3>
+                <Search className="w-5 h-5 text-sky-600" />
               </div>
 
-              <div className="p-6 rounded-2xl bg-slate-900/80 border border-slate-800 space-y-4">
-                <p className="text-xs text-slate-300 leading-relaxed">
-                  Search guidelines, taxonomy rules, or material descriptors across all 6 CPSE catalogs.
+              <div className="p-6 rounded-2xl bg-white border border-slate-200 shadow-sm space-y-4">
+                <p className="text-xs text-slate-600 leading-relaxed">
+                  Search guidelines, taxonomy rules, or material descriptors across all CPSE catalogs.
                 </p>
                 <div className="space-y-2">
                   <input
@@ -734,24 +719,24 @@ export default function HomePage() {
                     placeholder="e.g. Ball Valve Class 800..."
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
-                    className="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-2.5 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-amber-400 transition"
+                    className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 text-xs text-slate-900 placeholder-slate-400 focus:outline-none focus:border-amber-500 transition"
                   />
                   <button
                     onClick={() => alert(`Searching CANONIX repository for: "${searchQuery || 'Standard Materials'}"`)}
-                    className="w-full bg-gradient-to-r from-orange-500 to-amber-600 hover:from-orange-400 hover:to-amber-500 text-white font-bold text-xs py-2.5 rounded-xl transition shadow-md"
+                    className="w-full bg-gradient-to-r from-amber-500 to-orange-600 hover:from-amber-600 hover:to-orange-700 text-white font-bold text-xs py-2.5 rounded-xl transition shadow-md"
                   >
                     Search National Repository
                   </button>
                 </div>
 
-                <div className="pt-3 border-t border-slate-800 space-y-2 text-[11px] text-slate-400">
+                <div className="pt-3 border-t border-slate-200 space-y-2 text-[11px] text-slate-500">
                   <div className="flex items-center justify-between">
                     <span>Algorithm Weights:</span>
-                    <span className="text-slate-200 font-mono">Semantic 40% | Attr 30%</span>
+                    <span className="text-slate-800 font-mono">Semantic 40% | Attr 30%</span>
                   </div>
                   <div className="flex items-center justify-between">
                     <span>AI Model:</span>
-                    <span className="text-slate-200 font-mono">all-MiniLM-L6-v2 (384d)</span>
+                    <span className="text-slate-800 font-mono">all-MiniLM-L6-v2 (384d)</span>
                   </div>
                 </div>
               </div>
@@ -763,10 +748,10 @@ export default function HomePage() {
       </section>
 
       {/* ── Official Government Footer ── */}
-      <footer className="border-t border-slate-800 bg-slate-950 py-10 text-xs text-slate-400">
+      <footer className="border-t border-slate-200 bg-slate-900 text-slate-400 py-10 text-xs">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-8 mb-8 pb-8 border-b border-slate-900">
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-8 mb-8 pb-8 border-b border-slate-800">
             
             {/* Col 1: Ministry Info */}
             <div className="space-y-3">
@@ -783,7 +768,7 @@ export default function HomePage() {
             <div className="space-y-2">
               <h4 className="text-xs font-bold text-slate-200 uppercase tracking-wider">Technical Cell Contact</h4>
               <p className="text-slate-400 text-xs leading-relaxed">
-                CPCL Manali Refinery Complex,<br />
+                Refinery Operations Complex,<br />
                 Express Highway, Manali,<br />
                 Chennai - 600 068, Tamil Nadu.
               </p>
@@ -794,7 +779,7 @@ export default function HomePage() {
               <h4 className="text-xs font-bold text-slate-200 uppercase tracking-wider">Support & Helpdesk</h4>
               <p className="text-slate-400 text-xs">
                 Phone: +91 (044) 2594-4000<br />
-                Email: material.master@cpcl.co.in
+                Email: material.master@canonix.gov.in
               </p>
             </div>
 
@@ -810,9 +795,9 @@ export default function HomePage() {
 
           </div>
 
-          <div className="flex flex-col sm:flex-row items-center justify-between gap-4 text-[11px] text-slate-500">
+          <div className="flex flex-col sm:flex-row items-center justify-between gap-4 text-[11px] text-slate-400">
             <p>© 2026 Ministry of Petroleum & Natural Gas, Government of India. All rights reserved.</p>
-            <p>Powered by CPCL Smart Automation Initiative | SIH Problem Statement 26099</p>
+            <p>National Material Code Standardization & Harmonization Platform</p>
           </div>
 
         </div>
