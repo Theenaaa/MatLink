@@ -169,7 +169,7 @@ export default function SuperAdminDashboard() {
               Cross-CPSE Material Standardization & Multi-Tenant Administration
             </h1>
             <p className="text-xs text-slate-400 mt-1 max-w-2xl">
-              Welcome, <span className="text-slate-200 font-semibold">{user?.name}</span>. Universal access active across all Central Public Sector Enterprises under the Ministry of Petroleum &amp; Natural Gas.
+              Welcome, <span className="text-slate-200 font-semibold">{user?.name}</span>. Universal access active across all Central Public Sector Enterprises.
             </p>
           </div>
 

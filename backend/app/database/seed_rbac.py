@@ -82,7 +82,7 @@ def seed_rbac():
 
         users_data = [
             {
-                "name": "MoPNG National Administrator",
+                "name": "National Master Administrator",
                 "email": "superadmin@canonix.gov.in",
                 "password_hash": default_pwd,
                 "role": role_objects["SUPER_ADMIN"],

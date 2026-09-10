@@ -19,6 +19,8 @@ import {
   EyeOff,
 } from "lucide-react";
 
+import ThemeToggle from "@/components/ThemeToggle";
+
 interface DemoAccount {
   label: string;
   role: string;
@@ -32,7 +34,7 @@ const DEMO_ACCOUNTS: DemoAccount[] = [
   {
     label: "Super Administrator",
     role: "SUPER_ADMIN",
-    cpse: "MoPNG / National Command",
+    cpse: "National Master Hub",
     email: "superadmin@canonix.gov.in",
     badgeColor: "from-amber-500 to-orange-600",
     desc: "Universal cross-CPSE master visibility, taxonomies & platform control",
@@ -128,18 +130,21 @@ export default function LoginPage() {
               </span>
             </div>
             <p className="text-xs text-slate-400">
-              Ministry of Petroleum & Natural Gas · CPCL
+              National CPSE Technical Federation
             </p>
           </div>
         </div>
 
-        <a
-          href="/"
-          className="text-xs text-slate-400 hover:text-orange-400 flex items-center gap-1 transition"
-        >
-          <span>Platform Overview</span>
-          <ArrowRight className="w-3.5 h-3.5" />
-        </a>
+        <div className="flex items-center gap-3">
+          <ThemeToggle />
+          <a
+            href="/"
+            className="text-xs text-slate-400 hover:text-orange-400 flex items-center gap-1 transition"
+          >
+            <span>Platform Overview</span>
+            <ArrowRight className="w-3.5 h-3.5" />
+          </a>
+        </div>
       </header>
 
       {/* Login Content Area */}
@@ -315,7 +320,7 @@ export default function LoginPage() {
 
       {/* Footer */}
       <footer className="p-4 border-t border-slate-900 text-center text-xs text-slate-400 relative z-10">
-        CANONIX Platform · Ministry of Petroleum & Natural Gas · Government of India
+        CANONIX Platform · Government of India · All Rights Reserved
       </footer>
     </div>
   );

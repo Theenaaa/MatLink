@@ -26,6 +26,8 @@ import {
   Tag
 } from "lucide-react";
 
+import ThemeToggle from "@/components/ThemeToggle";
+
 // ── Ashoka Chakra & Government Emblem ─────────────────────────────
 const SPOKES = Array.from({ length: 24 }, (_, i) => {
   const angle = (i * 15 * Math.PI) / 180;
@@ -322,7 +324,7 @@ export default function HomePage() {
                 </span>
               </div>
               <p className="text-xs text-slate-500 font-medium">
-                Government of India · Ministry of Petroleum & Natural Gas
+                Government of India · CPSE Technical Federation
               </p>
             </div>
           </div>
@@ -336,7 +338,8 @@ export default function HomePage() {
           </nav>
 
           {/* Right Controls & Login Action */}
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-3">
+            <ThemeToggle />
             
             {/* Quick Role Login Dropdown */}
             <div className="relative" ref={dropdownRef}>
@@ -740,7 +743,7 @@ export default function HomePage() {
           </div>
 
           <div className="flex flex-col sm:flex-row items-center justify-between gap-4 text-[11px] text-slate-400">
-            <p>© 2026 Ministry of Petroleum & Natural Gas, Government of India. All rights reserved.</p>
+            <p>© 2026 Government of India · CPSE Technical Federation. All rights reserved.</p>
             <p>National Material Code Standardization & Harmonization Platform</p>
           </div>
 

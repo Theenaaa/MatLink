@@ -27,6 +27,8 @@ import {
   FolderTree,
 } from "lucide-react";
 
+import ThemeToggle from "@/components/ThemeToggle";
+
 interface NavItem {
   name: string;
   href: string;
@@ -47,7 +49,7 @@ export default function RoleShell({ children }: { children: React.ReactNode }) {
 
   const roleName = user.role.name;
   const cpseCode = user.cpse ? user.cpse.code : "UNIVERSAL";
-  const cpseFullName = user.cpse ? user.cpse.name : "MoPNG National Command";
+  const cpseFullName = user.cpse ? user.cpse.name : "National Master Hub";
 
   // Navigation based on Role
   let navItems: NavItem[] = [];
@@ -129,7 +131,7 @@ export default function RoleShell({ children }: { children: React.ReactNode }) {
                 </span>
               </div>
               <p className="text-[11px] text-slate-400 font-medium leading-none">
-                Ministry of Petroleum & Natural Gas · CPCL
+                National CPSE Technical Federation
               </p>
             </div>
           </div>
@@ -147,6 +149,9 @@ export default function RoleShell({ children }: { children: React.ReactNode }) {
 
         {/* Right Session Controls & User Profile */}
         <div className="flex items-center gap-3 md:gap-4">
+          {/* Theme Toggle Button */}
+          <ThemeToggle />
+
           {/* Tenant Isolation Guard Status */}
           <div className="hidden sm:flex items-center gap-1.5 text-xs text-emerald-400 bg-emerald-950/40 border border-emerald-800/50 px-2.5 py-1 rounded-full">
             <Lock className="w-3 h-3 text-emerald-400" />

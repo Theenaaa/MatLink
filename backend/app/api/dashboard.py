@@ -61,7 +61,7 @@ def get_dashboard_metrics(
             total_normalized=total_normalized,
             total_review_required=total_review,
             cpse_code="UNIVERSAL",
-            cpse_name="Ministry of Petroleum & Natural Gas (All CPSEs)",
+            cpse_name="National Master Hub (All CPSEs)",
             is_super_admin=True,
             cpse_breakdown=breakdown,
         )
