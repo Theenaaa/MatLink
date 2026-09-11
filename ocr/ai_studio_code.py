@@ -15,7 +15,7 @@ import numpy as np
 import pandas as pd
 import pymupdf as fitz
 import streamlit as st
-from PIL import Image, UnidentifiedImageError
+from PIL import Image, ImageOps, UnidentifiedImageError
 
 
 PDF_OCR_DPI = 300
@@ -262,30 +262,152 @@ def get_easyocr_reader(languages: tuple[str, ...], use_gpu: bool):
 
 
 def preprocess_for_ocr(image: Image.Image) -> tuple[np.ndarray, dict[str, Any]]:
-    rgb = np.array(image.convert("RGB"))
+    oriented_image = ImageOps.exif_transpose(image)
+    rgb = np.array(oriented_image.convert("RGB"))
     height, width = rgb.shape[:2]
     scale = 1.0
 
     target_min_dimension = 1600
-    if max(width, height) < target_min_dimension:
-        scale = target_min_dimension / max(width, height)
-        rgb = cv2.resize(rgb, None, fx=scale, fy=scale, interpolation=cv2.INTER_CUBIC)
+    target_max_dimension = 2880
+    longest_dimension = max(width, height)
+    if longest_dimension < target_min_dimension:
+        scale = target_min_dimension / longest_dimension
+    elif longest_dimension > target_max_dimension:
+        scale = target_max_dimension / longest_dimension
 
-    gray = cv2.cvtColor(rgb, cv2.COLOR_RGB2GRAY)
-    denoised = cv2.fastNlMeansDenoising(gray, h=10, templateWindowSize=7, searchWindowSize=21)
+    if scale != 1.0:
+        interpolation = cv2.INTER_CUBIC if scale > 1.0 else cv2.INTER_AREA
+        rgb = cv2.resize(rgb, None, fx=scale, fy=scale, interpolation=interpolation)
+
+    return rgb, {
+        "original_width": width,
+        "original_height": height,
+        "processed_width": int(rgb.shape[1]),
+        "processed_height": int(rgb.shape[0]),
+        "scale": round(scale, 4),
+        "steps": ["exif_orientation", "rgb_convert", "bounded_resize"],
+    }
+
+
+def enhance_ocr_image(image: np.ndarray) -> np.ndarray:
+    gray = cv2.cvtColor(image, cv2.COLOR_RGB2GRAY)
+    denoised = cv2.medianBlur(gray, 3)
     clahe = cv2.createCLAHE(clipLimit=2.2, tileGridSize=(8, 8))
     contrast = clahe.apply(denoised)
     sharpened = cv2.addWeighted(contrast, 1.5, cv2.GaussianBlur(contrast, (0, 0), 1.0), -0.5, 0)
-    processed = cv2.cvtColor(sharpened, cv2.COLOR_GRAY2RGB)
+    return cv2.cvtColor(sharpened, cv2.COLOR_GRAY2RGB)
 
-    return processed, {
-        "original_width": width,
-        "original_height": height,
-        "processed_width": int(processed.shape[1]),
-        "processed_height": int(processed.shape[0]),
-        "scale": round(scale, 4),
-        "steps": ["rgb_convert", "optional_upscale", "denoise", "clahe", "sharpen"],
+
+def read_easyocr_pass(reader: Any, image: np.ndarray) -> list[Any]:
+    return reader.readtext(
+        image,
+        detail=1,
+        paragraph=False,
+        batch_size=4,
+        workers=0,
+        canvas_size=2048,
+        mag_ratio=1.0,
+        min_size=5,
+        text_threshold=0.6,
+        low_text=0.3,
+        link_threshold=0.3,
+        slope_ths=0.15,
+        ycenter_ths=0.5,
+        height_ths=0.5,
+        width_ths=0.75,
+    )
+
+
+def detect_sideways_text(image: np.ndarray) -> dict[str, Any]:
+    gray = cv2.cvtColor(image, cv2.COLOR_RGB2GRAY)
+    height, width = gray.shape[:2]
+    longest_side = max(width, height)
+    if longest_side > 1600:
+        scale = 1600.0 / longest_side
+        gray = cv2.resize(gray, None, fx=scale, fy=scale, interpolation=cv2.INTER_AREA)
+        height, width = gray.shape[:2]
+
+    binary = cv2.threshold(gray, 0, 255, cv2.THRESH_BINARY_INV + cv2.THRESH_OTSU)[1]
+    horizontal_kernel = cv2.getStructuringElement(cv2.MORPH_RECT, (max(20, width // 35), 1))
+    vertical_kernel = cv2.getStructuringElement(cv2.MORPH_RECT, (1, max(20, height // 35)))
+    horizontal_lines = cv2.morphologyEx(binary, cv2.MORPH_OPEN, horizontal_kernel)
+    vertical_lines = cv2.morphologyEx(binary, cv2.MORPH_OPEN, vertical_kernel)
+    line_mask = cv2.bitwise_or(horizontal_lines, vertical_lines)
+    text_mask = cv2.bitwise_and(binary, cv2.bitwise_not(line_mask))
+
+    foreground_pixels = int(cv2.countNonZero(text_mask))
+    if foreground_pixels < max(100, int(width * height * 0.0001)):
+        text_mask = binary
+        foreground_pixels = int(cv2.countNonZero(text_mask))
+
+    row_density = np.count_nonzero(text_mask, axis=1) / max(1, width)
+    column_density = np.count_nonzero(text_mask, axis=0) / max(1, height)
+    row_variation = float(row_density.std() / (row_density.mean() + 1e-9))
+    column_variation = float(column_density.std() / (column_density.mean() + 1e-9))
+    sideways = foreground_pixels > 0 and column_variation > row_variation * 1.35
+    return {
+        "sideways": sideways,
+        "row_projection_variation": round(row_variation, 4),
+        "column_projection_variation": round(column_variation, 4),
+        "foreground_pixels": foreground_pixels,
     }
+
+
+def summarize_ocr_quality(results: list[Any]) -> dict[str, Any]:
+    texts: list[str] = []
+    confidences: list[float] = []
+    alphanumeric_lengths: list[int] = []
+    for result in results:
+        if len(result) < 3:
+            continue
+        text = clean_text(result[1])
+        if not text:
+            continue
+        texts.append(text)
+        confidences.append(max(0.0, min(1.0, float(result[2]))))
+        alphanumeric_lengths.append(len(re.sub(r"[^A-Za-z0-9]", "", text)))
+
+    count = len(texts)
+    character_count = sum(alphanumeric_lengths)
+    single_character_count = sum(length <= 1 for length in alphanumeric_lengths)
+    single_character_ratio = single_character_count / count if count else 0.0
+    mean_confidence = statistics.mean(confidences) if confidences else 0.0
+    meaningful_tokens = sum(length >= 2 for length in alphanumeric_lengths)
+    score = character_count * (0.5 + mean_confidence) + meaningful_tokens * 4 - single_character_count * 2
+    return {
+        "result_count": count,
+        "character_count": character_count,
+        "single_character_ratio": round(single_character_ratio, 4),
+        "mean_confidence": round(mean_confidence, 4),
+        "score": round(score, 4),
+    }
+
+
+def needs_orientation_retry(quality: dict[str, Any]) -> bool:
+    result_count = int(quality["result_count"])
+    return (
+        result_count >= 4
+        and float(quality["single_character_ratio"]) >= 0.65
+        and int(quality["character_count"]) <= result_count * 2
+    )
+
+
+def needs_enhancement_retry(quality: dict[str, Any]) -> bool:
+    return (
+        int(quality["result_count"]) == 0
+        or int(quality["character_count"]) < 8
+        or float(quality["mean_confidence"]) < 0.45
+    )
+
+
+def rotate_ocr_image(image: np.ndarray, degrees_clockwise: int) -> np.ndarray:
+    if degrees_clockwise == 90:
+        return cv2.rotate(image, cv2.ROTATE_90_CLOCKWISE)
+    if degrees_clockwise == 180:
+        return cv2.rotate(image, cv2.ROTATE_180)
+    if degrees_clockwise == 270:
+        return cv2.rotate(image, cv2.ROTATE_90_COUNTERCLOCKWISE)
+    return image
 
 
 def run_easyocr(
@@ -297,22 +419,63 @@ def run_easyocr(
     languages: tuple[str, ...],
     use_gpu: bool,
 ) -> tuple[list[TextElement], dict[str, Any]]:
-    processed, metadata = preprocess_for_ocr(image)
+    base_processed, metadata = preprocess_for_ocr(image)
     reader = get_easyocr_reader(languages, use_gpu)
 
-    results = reader.readtext(
-        processed,
-        detail=1,
-        paragraph=False,
-        batch_size=4,
-        workers=0,
-        canvas_size=2560,
-        mag_ratio=1.35,
-        slope_ths=0.15,
-        ycenter_ths=0.5,
-        height_ths=0.5,
-        width_ths=0.75,
-    )
+    orientation_hint = detect_sideways_text(base_processed)
+    selected_rotation = 90 if bool(orientation_hint["sideways"]) else 0
+    selected_variant = "bounded_rgb"
+    processed = rotate_ocr_image(base_processed, selected_rotation)
+    results = read_easyocr_pass(reader, processed)
+    quality = summarize_ocr_quality(results)
+    attempts = [{"rotation_degrees_clockwise": selected_rotation, **quality}]
+
+    if needs_orientation_retry(quality):
+        best_score = float(quality["score"])
+        rotations = (270, 0, 180) if selected_rotation == 90 else (90, 270, 180)
+        for rotation in rotations:
+            rotated = rotate_ocr_image(base_processed, rotation)
+            candidate_results = read_easyocr_pass(reader, rotated)
+            candidate_quality = summarize_ocr_quality(candidate_results)
+            attempts.append({"rotation_degrees_clockwise": rotation, **candidate_quality})
+            if float(candidate_quality["score"]) > best_score:
+                processed = rotated
+                results = candidate_results
+                quality = candidate_quality
+                best_score = float(candidate_quality["score"])
+                selected_rotation = rotation
+            if (
+                int(candidate_quality["character_count"]) >= 20
+                and float(candidate_quality["single_character_ratio"]) < 0.4
+            ):
+                break
+
+    if needs_enhancement_retry(quality):
+        enhanced = rotate_ocr_image(enhance_ocr_image(base_processed), selected_rotation)
+        enhanced_results = read_easyocr_pass(reader, enhanced)
+        enhanced_quality = summarize_ocr_quality(enhanced_results)
+        attempts.append(
+            {
+                "rotation_degrees_clockwise": selected_rotation,
+                "image_variant": "contrast_enhanced",
+                **enhanced_quality,
+            }
+        )
+        if float(enhanced_quality["score"]) > float(quality["score"]):
+            processed = enhanced
+            results = enhanced_results
+            quality = enhanced_quality
+            selected_variant = "contrast_enhanced"
+
+    metadata["processed_width"] = int(processed.shape[1])
+    metadata["processed_height"] = int(processed.shape[0])
+    metadata["ocr_rotation_degrees_clockwise"] = selected_rotation
+    metadata["orientation_projection"] = orientation_hint
+    metadata["ocr_image_variant"] = selected_variant
+    metadata["ocr_quality"] = quality
+    metadata["ocr_attempts"] = attempts
+    if len(attempts) > 1:
+        metadata["steps"].append("quality_retry")
 
     elements: list[TextElement] = []
     for result_index, result in enumerate(results, start=1):
@@ -865,6 +1028,12 @@ def process_pdf(
                 coordinate_space,
                 int(metadata["processed_width"]),
             )
+            if int(metadata["ocr_rotation_degrees_clockwise"]):
+                warnings.append(
+                    f"OCR auto-rotated this page {metadata['ocr_rotation_degrees_clockwise']} degrees clockwise."
+                )
+            if not elements:
+                warnings.append("OCR completed but did not detect readable text on this page.")
             render_dpi = PDF_OCR_DPI
 
         pages.append(
@@ -902,7 +1071,7 @@ def process_image(
     frame_count = int(getattr(source_image, "n_frames", 1))
     for frame_index in range(frame_count):
         source_image.seek(frame_index)
-        image = source_image.convert("RGB").copy()
+        image = ImageOps.exif_transpose(source_image.copy()).convert("RGB")
         page_number = frame_index + 1
         elements, metadata = run_easyocr(
             image,
@@ -921,6 +1090,13 @@ def process_image(
             "ocr_preprocessed_image_pixels",
             int(metadata["processed_width"]),
         )
+        warnings: list[str] = []
+        if int(metadata["ocr_rotation_degrees_clockwise"]):
+            warnings.append(
+                f"OCR auto-rotated this image {metadata['ocr_rotation_degrees_clockwise']} degrees clockwise."
+            )
+        if not elements:
+            warnings.append("OCR completed but did not detect readable text in this image.")
         pages.append(
             PageResult(
                 page=page_number,
@@ -932,6 +1108,7 @@ def process_image(
                 render_dpi=None,
                 elements=elements,
                 tables=tables,
+                warnings=warnings,
                 preview_image=image,
             )
         )
